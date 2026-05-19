@@ -1,15 +1,82 @@
 import { getWeatherInfo } from '../components/WeatherIcon';
 import { getMatIcon } from '../lib/weatherCodes';
-import type { WeatherResponse } from '../types/weather';
+import type { WeatherResponse, TempUnit, WindUnit } from '../types/weather';
 
 interface DashboardProps {
   weather: WeatherResponse;
   cityName: string;
   country: string;
   timezone: string;
+  tempUnit: TempUnit;
+  windUnit: WindUnit;
 }
 
-export default function Dashboard({ weather, cityName, country, timezone }: DashboardProps) {
+function getMatIconLocal(code: number) { return getMatIcon(code); }
+
+function formatLocalTime(isoLocal: string): string {
+  return isoLocal.slice(11, 16);
+}
+
+function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds }: { sunriseIso: string; sunsetIso: string; utcOffsetSeconds: number }) {
+  const toUtcMs = (iso: string) => new Date(iso + 'Z').getTime() - utcOffsetSeconds * 1000;
+  const sunriseMs = toUtcMs(sunriseIso);
+  const sunsetMs  = toUtcMs(sunsetIso);
+  const nowMs = Date.now();
+  const t = Math.max(0, Math.min(1, (nowMs - sunriseMs) / (sunsetMs - sunriseMs)));
+
+  const dayMs = sunsetMs - sunriseMs;
+  const h = Math.floor(dayMs / 3600000);
+  const m = Math.floor((dayMs % 3600000) / 60000);
+
+  const angle = Math.PI * t;
+  const sunX = 100 - 90 * Math.cos(angle);
+  const sunY = 100 - 90 * Math.sin(angle);
+  const isAboveHorizon = nowMs >= sunriseMs && nowMs <= sunsetMs;
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+        <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#f59e0b' }}>wb_sunny</span>
+        <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>
+          Sonne
+        </span>
+      </div>
+
+      <svg viewBox="0 0 200 110" style={{ width: '100%', height: 'auto', overflow: 'visible' }} aria-hidden="true">
+        {/* Horizon line */}
+        <line x1="10" y1="100" x2="190" y2="100" stroke="rgba(0,0,0,0.1)" strokeWidth="1" />
+        {/* Arc track */}
+        <path d="M 10,100 A 90,90 0 0 1 190,100" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="2" strokeLinecap="round" />
+        {/* Progress arc */}
+        {isAboveHorizon && (
+          <path
+            d={`M 10,100 A 90,90 0 0 1 ${sunX},${sunY}`}
+            fill="none"
+            stroke="#f59e0b"
+            strokeWidth="2"
+            strokeLinecap="round"
+            opacity="0.6"
+          />
+        )}
+        {/* Sun dot */}
+        <circle cx={sunX} cy={sunY} r="8" fill={isAboveHorizon ? '#f59e0b' : 'rgba(245,158,11,0.3)'} />
+        {/* Labels */}
+        <text x="10" y="116" textAnchor="middle" fontFamily="Inter" fontSize="11" fill="#717783">
+          {formatLocalTime(sunriseIso)}
+        </text>
+        <text x="190" y="116" textAnchor="middle" fontFamily="Inter" fontSize="11" fill="#717783">
+          {formatLocalTime(sunsetIso)}
+        </text>
+      </svg>
+
+      <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', textAlign: 'center', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
+        {h}h {m}min Tageslicht
+      </p>
+    </div>
+  );
+}
+
+export default function Dashboard({ weather, cityName, country, timezone, tempUnit, windUnit }: DashboardProps) {
   const { current, daily, hourly } = weather;
   const info = getWeatherInfo(current.weather_code);
 
@@ -21,17 +88,17 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
     month: 'long',
   });
 
-  // Find current hour index in hourly data
-  const nowISO = now.toISOString().slice(0, 13); // "2024-01-15T14"
+  const nowISO = now.toISOString().slice(0, 13);
   let currentHourIndex = hourly.time.findIndex(t => t.startsWith(nowISO));
   if (currentHourIndex < 0) currentHourIndex = 0;
 
-  // Show next 24 hours
   const hourlySlice = hourly.time.slice(currentHourIndex, currentHourIndex + 24);
 
   const todayMax = Math.round(daily.temperature_2m_max[0]);
   const todayMin = Math.round(daily.temperature_2m_min[0]);
   const todayPrecip = daily.precipitation_sum[0];
+  const tempSuffix = tempUnit === 'fahrenheit' ? '°F' : '°C';
+  const windSuffix = windUnit === 'mph' ? 'mph' : 'km/h';
 
   const glassCard: React.CSSProperties = {
     background: 'rgba(255,255,255,0.5)',
@@ -44,19 +111,18 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-      {/* Hero section */}
+      {/* Hero */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, paddingTop: 8 }}>
         <p style={{ fontFamily: 'Inter', fontSize: 15, color: '#414751', fontWeight: 500 }}>
           {cityName}{country ? `, ${country}` : ''}
         </p>
 
-        {/* Temperature */}
         <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 4, lineHeight: 1 }}>
           <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 112, letterSpacing: '-0.04em', color: '#0060ac', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
             {Math.round(current.temperature_2m)}
           </span>
           <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 44, color: '#0060ac', marginTop: 12 }}>
-            °
+            {tempSuffix}
           </span>
         </div>
 
@@ -64,18 +130,17 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
           {info.description}
         </p>
         <p style={{ fontFamily: 'Inter', fontSize: 14, color: '#717783', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-          Gefühlt {Math.round(current.apparent_temperature)}°
+          Gefühlt {Math.round(current.apparent_temperature)}{tempSuffix}
         </p>
         <p style={{ fontFamily: 'Inter', fontSize: 13, color: '#717783', marginTop: 2 }}>
           {dateStr}
         </p>
 
-        {/* Stats row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0060ac' }}>air</span>
             <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: '#414751', fontVariantNumeric: 'tabular-nums' }}>
-              {Math.round(current.windspeed_10m)} km/h
+              {Math.round(current.windspeed_10m)} {windSuffix}
             </span>
           </div>
           <div style={{ width: 1, height: 28, background: 'rgba(0,0,0,0.12)' }} />
@@ -88,42 +153,23 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
         </div>
       </div>
 
-      {/* Hourly forecast strip */}
+      {/* Hourly strip */}
       <div>
-        <p style={{
-          fontFamily: 'Inter', fontSize: 11, fontWeight: 600,
-          textTransform: 'uppercase', letterSpacing: '0.1em',
-          color: '#717783', marginBottom: 8, paddingLeft: 4,
-        }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#717783', marginBottom: 8, paddingLeft: 4 }}>
           Stündlich
         </p>
         <div style={{ ...glassCard, padding: '12px 8px' }}>
-          <div
-            className="hide-scrollbar"
-            style={{ display: 'flex', overflowX: 'auto', gap: 4 }}
-          >
+          <div className="hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', gap: 4 }}>
             {hourlySlice.map((timeStr, idx) => {
               const absIdx = currentHourIndex + idx;
               const temp = Math.round(hourly.temperature_2m[absIdx]);
               const code = hourly.weather_code[absIdx];
               const precip = hourly.precipitation_probability[absIdx];
-              const { icon, color } = getMatIcon(code);
-
+              const { icon, color } = getMatIconLocal(code);
               const hour = new Date(timeStr + ':00').getHours();
               const label = idx === 0 ? 'Jetzt' : `${String(hour).padStart(2, '0')}:00`;
-
               return (
-                <div
-                  key={timeStr}
-                  style={{
-                    minWidth: 64,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    padding: '12px 10px',
-                    gap: 4,
-                  }}
-                >
+                <div key={timeStr} style={{ minWidth: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 10px', gap: 4 }}>
                   <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783' }}>{label}</span>
                   <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color }}>{icon}</span>
                   <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
@@ -143,37 +189,39 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
       {/* Bento grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
 
-        {/* Card: Max/Min Temp */}
         <div style={{ ...glassCard, padding: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0060ac' }}>device_thermostat</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>
-              Max / Min
-            </span>
+            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>Max / Min</span>
           </div>
           <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>
             {todayMax}° / {todayMin}°
           </p>
-          <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>
-            Heute
-          </p>
+          <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>Heute</p>
         </div>
 
-        {/* Card: Precipitation */}
         <div style={{ ...glassCard, padding: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0060ac' }}>water_drop</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>
-              Niederschlag
-            </span>
+            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>Niederschlag</span>
           </div>
           <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>
             {todayPrecip.toFixed(1)} mm
           </p>
-          <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>
-            Heute gesamt
-          </p>
+          <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>Heute gesamt</p>
         </div>
+
+        {/* Sunrise/sunset card — full width */}
+        {daily.sunrise?.[0] && daily.sunset?.[0] && (
+          <div style={{ ...glassCard, padding: 16, gridColumn: '1 / -1' }}>
+            <SunArc
+              sunriseIso={daily.sunrise[0]}
+              sunsetIso={daily.sunset[0]}
+              utcOffsetSeconds={weather.utc_offset_seconds}
+            />
+          </div>
+        )}
+
       </div>
     </div>
   );
