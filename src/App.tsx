@@ -2,12 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { SearchBar } from './components/SearchBar';
 import { CurrentWeather } from './components/CurrentWeather';
 import { WeekForecast } from './components/WeekForecast';
-import { getWeatherInfo } from './components/WeatherIcon';
 import { fetchWeather, searchCities } from './api/weather';
 import type { WeatherResponse, GeoLocation } from './types/weather';
 import './App.css';
 
-// Hamburg, Germany defaults
 const DEFAULT_LAT = 53.5753;
 const DEFAULT_LON = 10.0153;
 const DEFAULT_CITY = 'Hamburg';
@@ -36,7 +34,6 @@ export default function App() {
     }
   }, []);
 
-  // Load Hamburg on mount
   useEffect(() => {
     loadWeather(DEFAULT_LAT, DEFAULT_LON, DEFAULT_CITY, DEFAULT_COUNTRY);
   }, [loadWeather]);
@@ -55,8 +52,6 @@ export default function App() {
       async (pos) => {
         const { latitude, longitude } = pos.coords;
         try {
-          // Reverse-geocode via city search not available; use coords directly
-          // Try to get city name by fetching nearby city
           const cities = await searchCities(`${latitude.toFixed(2)}`);
           if (cities.length > 0) {
             const c = cities[0];
@@ -78,78 +73,84 @@ export default function App() {
     );
   }
 
-  const weatherCode = weather?.current.weather_code ?? 0;
-  const info = getWeatherInfo(weatherCode);
-
   return (
-    <div
-      className={`min-h-screen w-full transition-all duration-1000 bg-gradient-to-br ${info.gradient}`}
-    >
-      {/* Layered background for depth */}
-      <div className="fixed inset-0 pointer-events-none" aria-hidden>
-        <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(0,0,0,0.25) 100%)' }}
-        />
-        <div
-          className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)' }}
-        />
-        <div
-          className="absolute top-1/2 -right-40 w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)' }}
-        />
-      </div>
+    <div className="min-h-screen w-full">
+      {/* Subtle radial accent top-right like the design */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(circle at 85% 5%, rgba(96,165,250,0.18) 0%, transparent 55%)' }}
+        aria-hidden
+      />
 
-      <div className="relative min-h-screen flex flex-col items-center px-5 pb-16">
-        {/* Search bar */}
-        <div className="w-full max-w-lg pt-10 pb-2">
-          <SearchBar onSelect={handleSelect} onGPS={handleGPS} isLoadingGPS={isLoadingGPS} />
+      {/* Sticky header */}
+      <header className="glass-header sticky top-0 z-50 w-full">
+        <div className="max-w-lg mx-auto px-6 h-16 flex items-center">
+          <SearchBar
+            cityName={cityName}
+            onSelect={handleSelect}
+            onGPS={handleGPS}
+            isLoadingGPS={isLoadingGPS}
+          />
         </div>
+      </header>
+
+      {/* Main content */}
+      <main className="max-w-lg mx-auto px-6 pt-8 pb-12 flex flex-col gap-8">
 
         {/* Error banner */}
         {error && (
-          <div className="w-full max-w-lg mt-3">
-            <div
-              className="rounded-2xl px-5 py-4 text-white flex items-center gap-3"
-              style={{
-                background: 'rgba(239,68,68,0.20)',
-                backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(239,68,68,0.30)',
-              }}
+          <div
+            className="rounded-xl px-4 py-3.5 flex items-center gap-3"
+            style={{ background: 'rgba(186,26,26,0.08)', border: '1px solid rgba(186,26,26,0.2)' }}
+          >
+            <span className="material-symbols-outlined text-[18px] flex-shrink-0" style={{ color: '#ba1a1a' }}>
+              warning
+            </span>
+            <p className="text-sm font-['Inter'] flex-1" style={{ color: '#93000a' }}>{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="flex-shrink-0 transition-opacity hover:opacity-60"
+              style={{ color: '#93000a' }}
             >
-              <span className="text-lg flex-shrink-0">⚠️</span>
-              <p className="text-sm flex-1">{error}</p>
-              <button
-                onClick={() => setError(null)}
-                className="text-white/60 hover:text-white transition-colors text-lg leading-none flex-shrink-0"
-              >
-                ×
-              </button>
-            </div>
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
           </div>
         )}
 
         {/* Loading skeleton */}
         {isLoading && (
-          <div className="flex flex-col items-center gap-10 w-full max-w-lg mt-10 animate-pulse">
-            <div className="flex flex-col items-center gap-3 w-full">
-              <div className="h-10 w-44 rounded-2xl bg-white/15" />
-              <div className="h-4 w-28 rounded-xl bg-white/10" />
-              <div className="h-36 w-36 rounded-full bg-white/15 mt-6" />
-              <div className="h-8 w-32 rounded-xl bg-white/10" />
+          <div className="flex flex-col items-center gap-8 animate-pulse">
+            <div className="flex flex-col items-center gap-3 pt-4">
+              <div className="h-28 w-36 rounded-2xl" style={{ background: 'rgba(0,96,172,0.08)' }} />
+              <div className="h-7 w-40 rounded-lg" style={{ background: 'rgba(0,0,0,0.07)' }} />
+              <div className="h-4 w-52 rounded" style={{ background: 'rgba(0,0,0,0.05)' }} />
             </div>
-            <div className="grid grid-cols-2 gap-3 w-full">
-              <div className="h-20 rounded-2xl bg-white/10" />
-              <div className="h-20 rounded-2xl bg-white/10" />
+            <div className="glass-card w-full rounded-xl p-5">
+              <div className="flex justify-around">
+                {[1, 2, 3].map(n => (
+                  <div key={n} className="flex flex-col items-center gap-2">
+                    <div className="h-6 w-6 rounded-full" style={{ background: 'rgba(0,0,0,0.07)' }} />
+                    <div className="h-3 w-12 rounded" style={{ background: 'rgba(0,0,0,0.05)' }} />
+                    <div className="h-5 w-14 rounded" style={{ background: 'rgba(0,0,0,0.07)' }} />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="w-full rounded-3xl bg-white/10 h-72" />
+            <div className="glass-card w-full rounded-xl overflow-hidden">
+              {[1, 2, 3, 4, 5, 6, 7].map(n => (
+                <div key={n} className="flex items-center gap-4 px-5 py-3.5" style={{ borderBottom: n < 7 ? '1px solid rgba(255,255,255,0.3)' : 'none' }}>
+                  <div className="h-4 w-20 rounded" style={{ background: 'rgba(0,0,0,0.06)' }} />
+                  <div className="h-5 w-5 rounded-full" style={{ background: 'rgba(0,0,0,0.06)' }} />
+                  <div className="flex-1 h-1.5 rounded-full" style={{ background: 'rgba(0,0,0,0.06)' }} />
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Main content */}
+        {/* Weather content */}
         {!isLoading && weather && (
-          <div className="w-full max-w-lg flex flex-col gap-6 animate-fade-in">
+          <div className="flex flex-col gap-8 animate-fade-in">
             <CurrentWeather
               data={weather.current}
               cityName={cityName}
@@ -160,10 +161,10 @@ export default function App() {
           </div>
         )}
 
-        <p className="mt-auto pt-10 text-white/25 text-xs text-center tracking-wide">
+        <p className="text-center text-xs font-['Inter'] mt-2" style={{ color: '#717783', opacity: 0.5 }}>
           Open-Meteo · Keine API-Schlüssel erforderlich
         </p>
-      </div>
+      </main>
     </div>
   );
 }
