@@ -39,11 +39,11 @@ export function SearchBar({ onSelect, onGPS, isLoadingGPS }: SearchBarProps) {
   }, [query, doSearch]);
 
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function handlePointer(e: PointerEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) close();
     }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('pointerdown', handlePointer);
+    return () => document.removeEventListener('pointerdown', handlePointer);
   }, []);
 
   function open() {
@@ -112,14 +112,19 @@ export function SearchBar({ onSelect, onGPS, isLoadingGPS }: SearchBarProps) {
                 }}
               />
               {query && (
-                <button onClick={() => setQuery('')}>
+                <button
+                  onClick={() => setQuery('')}
+                  aria-label="Suche löschen"
+                  style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 32, minHeight: 32, background: 'none', border: 'none', borderRadius: 6 }}
+                >
                   <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#717783' }}>close</span>
                 </button>
               )}
             </div>
             <button
               onClick={close}
-              style={{ fontSize: 15, fontFamily: 'Inter', fontWeight: 500, color: '#0060ac', whiteSpace: 'nowrap' }}
+              aria-label="Suche abbrechen"
+              style={{ fontSize: 15, fontFamily: 'Inter', fontWeight: 500, color: '#0060ac', whiteSpace: 'nowrap', cursor: 'pointer', background: 'none', border: 'none', padding: '10px 0', minHeight: 44 }}
             >
               Abbrechen
             </button>
@@ -157,8 +162,9 @@ export function SearchBar({ onSelect, onGPS, isLoadingGPS }: SearchBarProps) {
       <div style={{ display: 'flex', gap: 4 }}>
         <button
           onClick={open}
+          aria-label="Stadt suchen"
           style={{
-            width: 40, height: 40, borderRadius: 20, border: 'none',
+            width: 44, height: 44, borderRadius: 22, border: 'none',
             background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer',
           }}
@@ -168,8 +174,9 @@ export function SearchBar({ onSelect, onGPS, isLoadingGPS }: SearchBarProps) {
         <button
           onClick={onGPS}
           disabled={isLoadingGPS}
+          aria-label={isLoadingGPS ? 'Standort wird ermittelt' : 'Aktuellen Standort verwenden'}
           style={{
-            width: 40, height: 40, borderRadius: 20, border: 'none',
+            width: 44, height: 44, borderRadius: 22, border: 'none',
             background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', opacity: isLoadingGPS ? 0.4 : 1,
           }}

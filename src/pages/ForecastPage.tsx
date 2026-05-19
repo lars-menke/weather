@@ -1,5 +1,6 @@
 import type { DailyWeatherData } from '../types/weather';
 import { getWeatherInfo } from '../components/WeatherIcon';
+import { getMatIcon } from '../lib/weatherCodes';
 
 interface ForecastPageProps {
   data: DailyWeatherData;
@@ -17,20 +18,6 @@ function getDayLabel(dateStr: string, index: number, timezone: string): string {
   const date = new Date(dateStr + 'T12:00:00');
   const eng = date.toLocaleDateString('en-US', { timeZone: timezone, weekday: 'long' });
   return DAYS_DE[eng] ?? eng;
-}
-
-function getMatIcon(code: number): { icon: string; color: string } {
-  if (code === 0 || code === 1) return { icon: 'sunny',             color: '#f59e0b' };
-  if (code === 2)                return { icon: 'partly_cloudy_day', color: '#f59e0b' };
-  if (code === 3)                return { icon: 'cloud',             color: '#60a5fa' };
-  if (code === 45 || code === 48)return { icon: 'foggy',             color: '#94a3b8' };
-  if (code >= 51 && code <= 55)  return { icon: 'grain',             color: '#60a5fa' };
-  if (code >= 61 && code <= 65)  return { icon: 'rainy',             color: '#3b82f6' };
-  if (code >= 71 && code <= 75)  return { icon: 'ac_unit',           color: '#93c5fd' };
-  if (code >= 80 && code <= 82)  return { icon: 'rainy',             color: '#3b82f6' };
-  if (code === 85 || code === 86)return { icon: 'weather_snowy',     color: '#93c5fd' };
-  if (code >= 95)                return { icon: 'thunderstorm',      color: '#6366f1' };
-  return                                { icon: 'cloud',             color: '#60a5fa' };
 }
 
 export default function ForecastPage({ data, timezone }: ForecastPageProps) {
@@ -79,10 +66,10 @@ export default function ForecastPage({ data, timezone }: ForecastPageProps) {
               <span className="material-symbols-outlined mat-fill" style={{ fontSize: 22, color }}>
                 {icon}
               </span>
-              <span style={{ fontFamily: 'Outfit', fontSize: 32, fontWeight: 300, color: '#0060ac', lineHeight: 1 }}>
+              <span style={{ fontFamily: 'Outfit', fontSize: 32, fontWeight: 300, color: '#0060ac', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 {max}°
               </span>
-              <span style={{ fontFamily: 'Inter', fontSize: 15, color: '#717783' }}>
+              <span style={{ fontFamily: 'Inter', fontSize: 15, color: '#717783', fontVariantNumeric: 'tabular-nums' }}>
                 / {min}°
               </span>
             </div>
@@ -95,24 +82,24 @@ export default function ForecastPage({ data, timezone }: ForecastPageProps) {
               {precip > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span className="material-symbols-outlined mat-fill" style={{ fontSize: 14, color: '#3b82f6' }}>water_drop</span>
-                  <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#3b82f6' }}>{precip.toFixed(1)} mm</span>
+                  <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>{precip.toFixed(1)} mm</span>
                 </div>
               )}
             </div>
 
             {/* Temp bar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', width: 28, textAlign: 'right', flexShrink: 0 }}>
+              <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', width: 28, textAlign: 'right', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                 {min}°
               </span>
               <div style={{ flex: 1, height: 4, borderRadius: 9999, background: 'rgba(0,0,0,0.08)', position: 'relative' }}>
                 <div style={{
                   position: 'absolute', top: 0, height: '100%', borderRadius: 9999,
                   left: `${barLeft}%`, width: `${barWidth}%`,
-                  background: 'linear-gradient(to right, #93c5fd, #0060ac)',
+                  background: '#0060ac',
                 }} />
               </div>
-              <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 600, color: '#0b1c30', width: 28, flexShrink: 0 }}>
+              <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 600, color: '#0b1c30', width: 28, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                 {max}°
               </span>
             </div>

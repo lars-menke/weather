@@ -92,8 +92,8 @@ export default function App() {
         <SearchBar onSelect={handleSelect} onGPS={handleGPS} isLoadingGPS={isLoadingGPS} />
       </div>
 
-      {/* Page content */}
-      <div style={{ padding: '60px 20px 20px' }}>
+      {/* Page content — top pad clears the 44px search buttons (12px offset + 44px height + 12px gap) */}
+      <div style={{ padding: '68px 20px 20px' }}>
 
         {/* Error */}
         {error && (
@@ -104,7 +104,11 @@ export default function App() {
           }}>
             <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#ba1a1a', flexShrink: 0 }}>warning</span>
             <p style={{ flex: 1, fontSize: 13, fontFamily: 'Inter', color: '#93000a' }}>{error}</p>
-            <button onClick={() => setError(null)}>
+            <button
+              onClick={() => setError(null)}
+              aria-label="Fehler schließen"
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 32, minHeight: 32, background: 'none', border: 'none', borderRadius: 6, flexShrink: 0 }}
+            >
               <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#93000a' }}>close</span>
             </button>
           </div>

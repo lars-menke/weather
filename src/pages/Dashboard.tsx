@@ -1,4 +1,5 @@
 import { getWeatherInfo } from '../components/WeatherIcon';
+import { getMatIcon } from '../lib/weatherCodes';
 import type { WeatherResponse } from '../types/weather';
 
 interface DashboardProps {
@@ -6,20 +7,6 @@ interface DashboardProps {
   cityName: string;
   country: string;
   timezone: string;
-}
-
-function getMatIcon(code: number): { icon: string; color: string } {
-  if (code === 0 || code === 1) return { icon: 'sunny',             color: '#f59e0b' };
-  if (code === 2)                return { icon: 'partly_cloudy_day', color: '#f59e0b' };
-  if (code === 3)                return { icon: 'cloud',             color: '#60a5fa' };
-  if (code === 45 || code === 48)return { icon: 'foggy',             color: '#94a3b8' };
-  if (code >= 51 && code <= 55)  return { icon: 'grain',             color: '#60a5fa' };
-  if (code >= 61 && code <= 65)  return { icon: 'rainy',             color: '#3b82f6' };
-  if (code >= 71 && code <= 75)  return { icon: 'ac_unit',           color: '#93c5fd' };
-  if (code >= 80 && code <= 82)  return { icon: 'rainy',             color: '#3b82f6' };
-  if (code === 85 || code === 86)return { icon: 'weather_snowy',     color: '#93c5fd' };
-  if (code >= 95)                return { icon: 'thunderstorm',      color: '#6366f1' };
-  return                                { icon: 'cloud',             color: '#60a5fa' };
 }
 
 export default function Dashboard({ weather, cityName, country, timezone }: DashboardProps) {
@@ -65,7 +52,7 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
 
         {/* Temperature */}
         <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 4, lineHeight: 1 }}>
-          <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 112, letterSpacing: '-0.04em', color: '#0060ac', lineHeight: 1 }}>
+          <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 112, letterSpacing: '-0.04em', color: '#0060ac', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
             {Math.round(current.temperature_2m)}
           </span>
           <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 44, color: '#0060ac', marginTop: 12 }}>
@@ -76,7 +63,7 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
         <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', marginTop: 4 }}>
           {info.description}
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 14, color: '#717783', marginTop: 4 }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 14, color: '#717783', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
           Gefühlt {Math.round(current.apparent_temperature)}°
         </p>
         <p style={{ fontFamily: 'Inter', fontSize: 13, color: '#717783', marginTop: 2 }}>
@@ -87,14 +74,14 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0060ac' }}>air</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: '#414751' }}>
+            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: '#414751', fontVariantNumeric: 'tabular-nums' }}>
               {Math.round(current.windspeed_10m)} km/h
             </span>
           </div>
           <div style={{ width: 1, height: 28, background: 'rgba(0,0,0,0.12)' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0060ac' }}>humidity_percentage</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: '#414751' }}>
+            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: '#414751', fontVariantNumeric: 'tabular-nums' }}>
               {current.relativehumidity_2m}%
             </span>
           </div>
@@ -139,11 +126,11 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
                 >
                   <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783' }}>{label}</span>
                   <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color }}>{icon}</span>
-                  <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: '#0b1c30' }}>{temp}°</span>
+                  <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
                   {precip > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#3b82f6', flexShrink: 0 }} />
-                      <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6' }}>{precip}%</span>
+                      <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>{precip}%</span>
                     </div>
                   )}
                 </div>
@@ -164,7 +151,7 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
               Max / Min
             </span>
           </div>
-          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30' }}>
+          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>
             {todayMax}° / {todayMin}°
           </p>
           <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>
@@ -180,7 +167,7 @@ export default function Dashboard({ weather, cityName, country, timezone }: Dash
               Niederschlag
             </span>
           </div>
-          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30' }}>
+          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>
             {todayPrecip.toFixed(1)} mm
           </p>
           <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>
