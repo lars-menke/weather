@@ -18,7 +18,7 @@ function formatLocalTime(isoLocal: string): string {
   return isoLocal.slice(11, 16);
 }
 
-function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds }: { sunriseIso: string; sunsetIso: string; utcOffsetSeconds: number }) {
+function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds, isDark }: { sunriseIso: string; sunsetIso: string; utcOffsetSeconds: number; isDark: boolean }) {
   const toUtcMs = (iso: string) => new Date(iso + 'Z').getTime() - utcOffsetSeconds * 1000;
   const sunriseMs = toUtcMs(sunriseIso);
   const sunsetMs  = toUtcMs(sunsetIso);
@@ -45,9 +45,9 @@ function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds }: { sunriseIso: strin
 
       <svg viewBox="0 0 200 110" style={{ width: '100%', height: 'auto', overflow: 'visible' }} aria-hidden="true">
         {/* Horizon line */}
-        <line x1="10" y1="100" x2="190" y2="100" stroke="rgba(0,0,0,0.1)" strokeWidth="1" />
+        <line x1="10" y1="100" x2="190" y2="100" stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'} strokeWidth="1" />
         {/* Arc track */}
-        <path d="M 10,100 A 90,90 0 0 1 190,100" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="2" strokeLinecap="round" />
+        <path d="M 10,100 A 90,90 0 0 1 190,100" fill="none" stroke={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'} strokeWidth="2" strokeLinecap="round" />
         {/* Progress arc */}
         {isAboveHorizon && (
           <path
@@ -62,15 +62,15 @@ function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds }: { sunriseIso: strin
         {/* Sun dot */}
         <circle cx={sunX} cy={sunY} r="8" fill={isAboveHorizon ? '#f59e0b' : 'rgba(245,158,11,0.3)'} />
         {/* Labels */}
-        <text x="10" y="116" textAnchor="middle" fontFamily="Inter" fontSize="11" fill="#717783">
+        <text x="10" y="116" textAnchor="middle" fontFamily="Inter" fontSize="11" fill={isDark ? 'rgba(255,255,255,0.6)' : '#717783'}>
           {formatLocalTime(sunriseIso)}
         </text>
-        <text x="190" y="116" textAnchor="middle" fontFamily="Inter" fontSize="11" fill="#717783">
+        <text x="190" y="116" textAnchor="middle" fontFamily="Inter" fontSize="11" fill={isDark ? 'rgba(255,255,255,0.6)' : '#717783'}>
           {formatLocalTime(sunsetIso)}
         </text>
       </svg>
 
-      <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', textAlign: 'center', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
+      <p style={{ fontFamily: 'Inter', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.6)' : '#717783', textAlign: 'center', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
         {h}h {m}min Tageslicht
       </p>
     </div>
@@ -160,7 +160,7 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
 
       {/* Hourly strip */}
       <div>
-        <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#717783', marginBottom: 8, paddingLeft: 4 }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: c.muted, marginBottom: 8, paddingLeft: 4 }}>
           Stündlich
         </p>
         <div style={{ ...glassCard, padding: '12px 8px' }}>
@@ -175,9 +175,9 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
               const label = idx === 0 ? 'Jetzt' : `${String(hour).padStart(2, '0')}:00`;
               return (
                 <div key={timeStr} style={{ minWidth: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 10px', gap: 4 }}>
-                  <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783' }}>{label}</span>
+                  <span style={{ fontFamily: 'Inter', fontSize: 12, color: c.muted }}>{label}</span>
                   <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color }}>{icon}</span>
-                  <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
+                  <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
                   {precip > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#3b82f6', flexShrink: 0 }} />
@@ -196,24 +196,24 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
 
         <div style={{ ...glassCard, padding: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0060ac' }}>device_thermostat</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>Max / Min</span>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, color: c.accent }}>device_thermostat</span>
+            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: c.muted }}>Max / Min</span>
           </div>
-          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>
+          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>
             {todayMax}° / {todayMin}°
           </p>
-          <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>Heute</p>
+          <p style={{ fontFamily: 'Inter', fontSize: 12, color: c.muted, marginTop: 4 }}>Heute</p>
         </div>
 
         <div style={{ ...glassCard, padding: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0060ac' }}>water_drop</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>Niederschlag</span>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, color: c.accent }}>water_drop</span>
+            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: c.muted }}>Niederschlag</span>
           </div>
-          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>
+          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>
             {todayPrecip.toFixed(1)} mm
           </p>
-          <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>Heute gesamt</p>
+          <p style={{ fontFamily: 'Inter', fontSize: 12, color: c.muted, marginTop: 4 }}>Heute gesamt</p>
         </div>
 
         {/* Sunrise/sunset card — full width */}
@@ -223,6 +223,7 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
               sunriseIso={daily.sunrise[0]}
               sunsetIso={daily.sunset[0]}
               utcOffsetSeconds={weather.utc_offset_seconds}
+              isDark={isDark}
             />
           </div>
         )}
