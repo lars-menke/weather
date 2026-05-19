@@ -83,32 +83,48 @@ export default function App() {
 
   return (
     <div
-      className={`min-h-screen w-full bg-gradient-to-br ${info.gradient} transition-all duration-1000`}
+      className={`min-h-screen w-full transition-all duration-1000 bg-gradient-to-br ${info.gradient}`}
     >
-      {/* Decorative blobs for depth */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute top-1/3 -right-32 w-80 h-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-32 left-1/3 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
+      {/* Layered background for depth */}
+      <div className="fixed inset-0 pointer-events-none" aria-hidden>
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(0,0,0,0.25) 100%)' }}
+        />
+        <div
+          className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)' }}
+        />
+        <div
+          className="absolute top-1/2 -right-40 w-[500px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)' }}
+        />
       </div>
 
-      <div className="relative min-h-screen flex flex-col items-center px-4 pb-12">
-        {/* Top bar */}
-        <div className="w-full max-w-2xl pt-8 pb-4">
+      <div className="relative min-h-screen flex flex-col items-center px-5 pb-16">
+        {/* Search bar */}
+        <div className="w-full max-w-lg pt-10 pb-2">
           <SearchBar onSelect={handleSelect} onGPS={handleGPS} isLoadingGPS={isLoadingGPS} />
         </div>
 
-        {/* Error */}
+        {/* Error banner */}
         {error && (
-          <div className="w-full max-w-2xl mb-4">
-            <div className="rounded-2xl bg-red-500/20 backdrop-blur-md border border-red-400/30 px-5 py-4 text-white flex items-center gap-3">
-              <span className="text-2xl">⚠️</span>
-              <p className="text-sm">{error}</p>
+          <div className="w-full max-w-lg mt-3">
+            <div
+              className="rounded-2xl px-5 py-4 text-white flex items-center gap-3"
+              style={{
+                background: 'rgba(239,68,68,0.20)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(239,68,68,0.30)',
+              }}
+            >
+              <span className="text-lg flex-shrink-0">⚠️</span>
+              <p className="text-sm flex-1">{error}</p>
               <button
                 onClick={() => setError(null)}
-                className="ml-auto text-white/70 hover:text-white transition-colors"
+                className="text-white/60 hover:text-white transition-colors text-lg leading-none flex-shrink-0"
               >
-                ✕
+                ×
               </button>
             </div>
           </div>
@@ -116,20 +132,24 @@ export default function App() {
 
         {/* Loading skeleton */}
         {isLoading && (
-          <div className="flex flex-col items-center gap-8 w-full max-w-2xl mt-8 animate-pulse">
-            <div className="flex flex-col items-center gap-4">
-              <div className="h-12 w-48 rounded-2xl bg-white/20" />
-              <div className="h-5 w-24 rounded-xl bg-white/15" />
-              <div className="h-32 w-32 rounded-full bg-white/20 mt-4" />
-              <div className="h-24 w-48 rounded-2xl bg-white/20" />
+          <div className="flex flex-col items-center gap-10 w-full max-w-lg mt-10 animate-pulse">
+            <div className="flex flex-col items-center gap-3 w-full">
+              <div className="h-10 w-44 rounded-2xl bg-white/15" />
+              <div className="h-4 w-28 rounded-xl bg-white/10" />
+              <div className="h-36 w-36 rounded-full bg-white/15 mt-6" />
+              <div className="h-8 w-32 rounded-xl bg-white/10" />
             </div>
-            <div className="w-full rounded-3xl bg-white/10 h-64" />
+            <div className="grid grid-cols-2 gap-3 w-full">
+              <div className="h-20 rounded-2xl bg-white/10" />
+              <div className="h-20 rounded-2xl bg-white/10" />
+            </div>
+            <div className="w-full rounded-3xl bg-white/10 h-72" />
           </div>
         )}
 
-        {/* Content */}
+        {/* Main content */}
         {!isLoading && weather && (
-          <div className="w-full max-w-2xl flex flex-col items-center gap-8 animate-fade-in">
+          <div className="w-full max-w-lg flex flex-col gap-6 animate-fade-in">
             <CurrentWeather
               data={weather.current}
               cityName={cityName}
@@ -140,9 +160,8 @@ export default function App() {
           </div>
         )}
 
-        {/* Footer */}
-        <p className="mt-auto pt-8 text-white/30 text-xs text-center">
-          Powered by Open-Meteo • Keine API-Schlüssel erforderlich
+        <p className="mt-auto pt-10 text-white/25 text-xs text-center tracking-wide">
+          Open-Meteo · Keine API-Schlüssel erforderlich
         </p>
       </div>
     </div>
