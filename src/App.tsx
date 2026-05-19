@@ -74,83 +74,49 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen w-full">
-      {/* Subtle radial accent top-right like the design */}
-      <div
-        className="fixed inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(circle at 85% 5%, rgba(96,165,250,0.18) 0%, transparent 55%)' }}
-        aria-hidden
-      />
+    <div style={{ minHeight: '100dvh', paddingTop: 'env(safe-area-inset-top)' }}>
 
-      {/* Sticky header */}
-      <header className="glass-header sticky top-0 z-50 w-full">
-        <div className="px-4 h-14 flex items-center">
-          <SearchBar
-            cityName={cityName}
-            onSelect={handleSelect}
-            onGPS={handleGPS}
-            isLoadingGPS={isLoadingGPS}
-          />
-        </div>
-      </header>
+      {/* Top bar — icon buttons only, no nav chrome */}
+      <div style={{
+        position: 'absolute', top: 'calc(env(safe-area-inset-top) + 12px)',
+        right: 16, zIndex: 10,
+      }}>
+        <SearchBar onSelect={handleSelect} onGPS={handleGPS} isLoadingGPS={isLoadingGPS} />
+      </div>
 
-      {/* Main content */}
-      <main className="px-4 pt-6 pb-10 flex flex-col gap-6">
+      {/* Scrollable content */}
+      <div style={{ padding: '60px 20px 40px', display: 'flex', flexDirection: 'column', gap: 28 }}>
 
-        {/* Error banner */}
+        {/* Error */}
         {error && (
-          <div
-            className="rounded-xl px-4 py-3.5 flex items-center gap-3"
-            style={{ background: 'rgba(186,26,26,0.08)', border: '1px solid rgba(186,26,26,0.2)' }}
-          >
-            <span className="material-symbols-outlined text-[18px] flex-shrink-0" style={{ color: '#ba1a1a' }}>
-              warning
-            </span>
-            <p className="text-sm font-['Inter'] flex-1" style={{ color: '#93000a' }}>{error}</p>
-            <button
-              onClick={() => setError(null)}
-              className="flex-shrink-0 transition-opacity hover:opacity-60"
-              style={{ color: '#93000a' }}
-            >
-              <span className="material-symbols-outlined text-[18px]">close</span>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            background: 'rgba(186,26,26,0.08)', border: '1px solid rgba(186,26,26,0.18)',
+            borderRadius: 12, padding: '12px 14px',
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#ba1a1a', flexShrink: 0 }}>warning</span>
+            <p style={{ flex: 1, fontSize: 13, fontFamily: 'Inter', color: '#93000a' }}>{error}</p>
+            <button onClick={() => setError(null)}>
+              <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#93000a' }}>close</span>
             </button>
           </div>
         )}
 
         {/* Loading skeleton */}
         {isLoading && (
-          <div className="flex flex-col items-center gap-8 animate-pulse">
-            <div className="flex flex-col items-center gap-3 pt-4">
-              <div className="h-28 w-36 rounded-2xl" style={{ background: 'rgba(0,96,172,0.08)' }} />
-              <div className="h-7 w-40 rounded-lg" style={{ background: 'rgba(0,0,0,0.07)' }} />
-              <div className="h-4 w-52 rounded" style={{ background: 'rgba(0,0,0,0.05)' }} />
-            </div>
-            <div className="glass-card w-full rounded-xl p-5">
-              <div className="flex justify-around">
-                {[1, 2, 3].map(n => (
-                  <div key={n} className="flex flex-col items-center gap-2">
-                    <div className="h-6 w-6 rounded-full" style={{ background: 'rgba(0,0,0,0.07)' }} />
-                    <div className="h-3 w-12 rounded" style={{ background: 'rgba(0,0,0,0.05)' }} />
-                    <div className="h-5 w-14 rounded" style={{ background: 'rgba(0,0,0,0.07)' }} />
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="glass-card w-full rounded-xl overflow-hidden">
-              {[1, 2, 3, 4, 5, 6, 7].map(n => (
-                <div key={n} className="flex items-center gap-4 px-5 py-3.5" style={{ borderBottom: n < 7 ? '1px solid rgba(255,255,255,0.3)' : 'none' }}>
-                  <div className="h-4 w-20 rounded" style={{ background: 'rgba(0,0,0,0.06)' }} />
-                  <div className="h-5 w-5 rounded-full" style={{ background: 'rgba(0,0,0,0.06)' }} />
-                  <div className="flex-1 h-1.5 rounded-full" style={{ background: 'rgba(0,0,0,0.06)' }} />
-                </div>
-              ))}
-            </div>
+          <div className="animate-pulse" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+            <div style={{ height: 16, width: 120, borderRadius: 8, background: 'rgba(0,0,0,0.08)' }} />
+            <div style={{ height: 110, width: 160, borderRadius: 12, background: 'rgba(0,96,172,0.08)', marginTop: 8 }} />
+            <div style={{ height: 24, width: 140, borderRadius: 8, background: 'rgba(0,0,0,0.07)' }} />
+            <div style={{ height: 16, width: 100, borderRadius: 8, background: 'rgba(0,0,0,0.05)' }} />
+            <div style={{ height: 36, width: 180, borderRadius: 8, background: 'rgba(0,0,0,0.05)', marginTop: 8 }} />
+            <div style={{ width: '100%', height: 300, borderRadius: 16, background: 'rgba(255,255,255,0.4)', marginTop: 12 }} />
           </div>
         )}
 
         {/* Weather content */}
         {!isLoading && weather && (
-          <div className="flex flex-col gap-8 animate-fade-in">
+          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
             <CurrentWeather
               data={weather.current}
               cityName={cityName}
@@ -158,13 +124,12 @@ export default function App() {
               timezone={weather.timezone}
             />
             <WeekForecast data={weather.daily} timezone={weather.timezone} />
+            <p style={{ textAlign: 'center', fontSize: 11, fontFamily: 'Inter', color: '#c1c7d3', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+              Open-Meteo · Keine API-Schlüssel erforderlich
+            </p>
           </div>
         )}
-
-        <p className="text-center text-xs font-['Inter'] mt-2" style={{ color: '#717783', opacity: 0.5 }}>
-          Open-Meteo · Keine API-Schlüssel erforderlich
-        </p>
-      </main>
+      </div>
     </div>
   );
 }
