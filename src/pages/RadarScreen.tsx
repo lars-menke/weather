@@ -103,8 +103,12 @@ export default function RadarScreen({ lat, lon }: Props) {
   }, [playing, frames.length, advance]);
 
   const currentFrame = frames[frameIndex];
-  const timeLabel = currentFrame
-    ? new Date(currentFrame.time * 1000).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
+  const frameDate = currentFrame ? new Date(currentFrame.time * 1000) : null;
+  const dateLabel = frameDate
+    ? frameDate.toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short' })
+    : '';
+  const timeLabel = frameDate
+    ? frameDate.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
     : '';
   const isPast = currentFrame && currentFrame.time * 1000 < Date.now();
 
@@ -135,9 +139,10 @@ export default function RadarScreen({ lat, lon }: Props) {
           gap: 6,
         }}>
           <span className="material-symbols-outlined" style={{ fontSize: 14 }}>radar</span>
-          {isPast ? '' : '▸ '}
-          {timeLabel} Uhr
-          {!isPast && <span style={{ fontSize: 11, opacity: 0.7, marginLeft: 4 }}>Prognose</span>}
+          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {dateLabel} · {timeLabel} Uhr
+          </span>
+          {!isPast && <span style={{ fontSize: 11, opacity: 0.65, marginLeft: 2 }}>Prognose</span>}
         </div>
       )}
 
