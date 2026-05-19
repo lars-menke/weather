@@ -11,13 +11,23 @@ body {
   background: linear-gradient(180deg, #d4e3ff 0%, #f8f9ff 100%);
   background-attachment: fixed;
   min-height: 100vh;
+  min-height: 100dvh;
   color: #0b1c30;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* iOS safe area */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Header accounts for safe area (sticky header sits inside root, body padding handles top) */
+.glass-header {
+  padding-top: 0;
 }
 
 .glass-card {
