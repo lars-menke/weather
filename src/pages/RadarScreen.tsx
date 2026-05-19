@@ -21,14 +21,12 @@ export default function RadarScreen({ lat, lon }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layersRef = useRef<L.TileLayer[]>([]);
-  const animFrameRef = useRef<number | null>(null);
 
   const [frames, setFrames] = useState<{ path: string; time: number; host: string }[]>([]);
   const [frameIndex, setFrameIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const [loaded, setLoaded] = useState(false);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
-  // Init map once
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
@@ -47,11 +45,9 @@ export default function RadarScreen({ lat, lon }: Props) {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Location marker
     L.circle([lat, lon], { radius: 5000, color: '#0060ac', fillColor: '#0060ac', fillOpacity: 0.25, weight: 2 }).addTo(map);
     L.circle([lat, lon], { radius: 1200, color: '#0060ac', fillColor: '#0060ac', fillOpacity: 0.9, weight: 0 }).addTo(map);
 
-    // Fetch RainViewer frames
     fetch('https://api.rainviewer.com/public/weather-maps.json')
       .then(r => r.json())
       .then((data: RainViewerData) => {
@@ -60,9 +56,8 @@ export default function RadarScreen({ lat, lon }: Props) {
           ...(data.radar.nowcast ?? []),
         ].map(f => ({ path: f.path, time: f.time, host: data.host }));
 
-        if (allFrames.length === 0) return;
+        if (allFrames.length === 0) { setStatus('error'); return; }
 
-        // Pre-create one tile layer per frame, all hidden
         const layers = allFrames.map(f =>
           L.tileLayer(`${f.host}${f.path}/256/{z}/{x}/{y}/2/1_1.png`, {
             opacity: 0,
@@ -72,12 +67,11 @@ export default function RadarScreen({ lat, lon }: Props) {
         layersRef.current = layers;
         setFrames(allFrames);
         setFrameIndex(allFrames.length - 1);
-        setLoaded(true);
+        setStatus('ready');
       })
-      .catch(() => setLoaded(true));
+      .catch(() => setStatus('error'));
 
     return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       map.remove();
       mapRef.current = null;
       layersRef.current = [];
@@ -103,67 +97,73 @@ export default function RadarScreen({ lat, lon }: Props) {
   }, [playing, frames.length, advance]);
 
   const currentFrame = frames[frameIndex];
-  const frameDate = currentFrame ? new Date(currentFrame.time * 1000) : null;
-  const dateLabel = frameDate
+  const frameMs = currentFrame ? currentFrame.time * 1000 : null;
+  const frameDate = frameMs ? new Date(frameMs) : null;
+  const isPast = frameMs ? frameMs < Date.now() : true;
+
+  const dateStr = frameDate
     ? frameDate.toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short' })
     : '';
-  const timeLabel = frameDate
+  const timeStr = frameDate
     ? frameDate.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
     : '';
-  const isPast = currentFrame && currentFrame.time * 1000 < Date.now();
+
+  const overlayBase: React.CSSProperties = {
+    position: 'fixed',
+    zIndex: 10000,
+    fontFamily: 'Inter',
+    fontWeight: 500,
+    pointerEvents: 'none',
+    whiteSpace: 'nowrap',
+  };
 
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
-      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+    <>
+      {/* Map container */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
+        <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+      </div>
 
-      {/* Timestamp badge — always rendered once loaded, zIndex above Leaflet panes */}
-      {loaded && frames.length > 0 && (
-        <div style={{
-          position: 'absolute',
-          top: 'calc(env(safe-area-inset-top) + 16px)',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 1000,
-          background: 'rgba(11,28,48,0.80)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderRadius: 20,
-          padding: '7px 16px',
-          fontFamily: 'Inter',
-          fontSize: 13,
-          fontWeight: 500,
-          color: '#fff',
-          pointerEvents: 'none',
-          whiteSpace: 'nowrap',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 7,
-        }}>
-          <span className="material-symbols-outlined" style={{ fontSize: 15, lineHeight: 1 }}>radar</span>
-          {dateLabel && timeLabel ? (
-            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {dateLabel} · {timeLabel} Uhr
-            </span>
-          ) : (
-            <span>Wird geladen…</span>
-          )}
-          {!isPast && timeLabel && (
-            <span style={{ fontSize: 11, opacity: 0.7, background: 'rgba(255,255,255,0.15)', borderRadius: 6, padding: '2px 6px' }}>
-              Prognose
-            </span>
-          )}
-        </div>
-      )}
+      {/* Timestamp badge — fixed, always above Leaflet */}
+      <div style={{
+        ...overlayBase,
+        top: 'calc(env(safe-area-inset-top) + 16px)',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: 'rgba(11,28,48,0.82)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderRadius: 20,
+        padding: '7px 16px',
+        fontSize: 13,
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 7,
+      }}>
+        <span className="material-symbols-outlined" style={{ fontSize: 15, lineHeight: 1 }}>radar</span>
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+          {status === 'loading' && 'Wird geladen…'}
+          {status === 'error'   && 'Keine Radardaten'}
+          {status === 'ready'   && dateStr && timeStr && `${dateStr} · ${timeStr} Uhr`}
+          {status === 'ready'   && (!dateStr || !timeStr) && 'Laden…'}
+        </span>
+        {status === 'ready' && !isPast && timeStr && (
+          <span style={{ fontSize: 11, opacity: 0.75, background: 'rgba(255,255,255,0.15)', borderRadius: 6, padding: '2px 6px', pointerEvents: 'none' }}>
+            Prognose
+          </span>
+        )}
+      </div>
 
-      {/* Play/Pause + scrubber */}
-      {loaded && frames.length > 0 && (
+      {/* Play/Pause + scrubber — fixed, always above Leaflet */}
+      {status === 'ready' && frames.length > 0 && (
         <div style={{
-          position: 'absolute',
+          ...overlayBase,
+          pointerEvents: 'auto',
           bottom: 'calc(env(safe-area-inset-bottom) + 80px)',
           left: 16,
           right: 16,
-          zIndex: 1000,
-          background: 'rgba(11,28,48,0.80)',
+          background: 'rgba(11,28,48,0.82)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           borderRadius: 16,
@@ -188,8 +188,7 @@ export default function RadarScreen({ lat, lon }: Props) {
             </span>
           </button>
 
-          {/* Frame dots */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 3, overflowX: 'hidden' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 3 }}>
             {frames.map((_, i) => (
               <button
                 key={i}
@@ -207,27 +206,6 @@ export default function RadarScreen({ lat, lon }: Props) {
           </div>
         </div>
       )}
-
-      {loaded && frames.length === 0 && (
-        <div style={{
-          position: 'absolute',
-          top: 'calc(env(safe-area-inset-top) + 16px)',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'rgba(255,255,255,0.88)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderRadius: 12,
-          padding: '8px 16px',
-          fontFamily: 'Inter',
-          fontSize: 13,
-          color: '#717783',
-          pointerEvents: 'none',
-          whiteSpace: 'nowrap',
-        }}>
-          Keine Radardaten verfügbar
-        </div>
-      )}
-    </div>
+    </>
   );
 }
