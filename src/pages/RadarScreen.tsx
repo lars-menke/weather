@@ -116,18 +116,19 @@ export default function RadarScreen({ lat, lon }: Props) {
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 
-      {/* Timestamp badge */}
+      {/* Timestamp badge — always rendered once loaded, zIndex above Leaflet panes */}
       {loaded && frames.length > 0 && (
         <div style={{
           position: 'absolute',
           top: 'calc(env(safe-area-inset-top) + 16px)',
           left: '50%',
           transform: 'translateX(-50%)',
-          background: 'rgba(11,28,48,0.72)',
+          zIndex: 1000,
+          background: 'rgba(11,28,48,0.80)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderRadius: 20,
-          padding: '6px 14px',
+          padding: '7px 16px',
           fontFamily: 'Inter',
           fontSize: 13,
           fontWeight: 500,
@@ -136,13 +137,21 @@ export default function RadarScreen({ lat, lon }: Props) {
           whiteSpace: 'nowrap',
           display: 'flex',
           alignItems: 'center',
-          gap: 6,
+          gap: 7,
         }}>
-          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>radar</span>
-          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {dateLabel} · {timeLabel} Uhr
-          </span>
-          {!isPast && <span style={{ fontSize: 11, opacity: 0.65, marginLeft: 2 }}>Prognose</span>}
+          <span className="material-symbols-outlined" style={{ fontSize: 15, lineHeight: 1 }}>radar</span>
+          {dateLabel && timeLabel ? (
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {dateLabel} · {timeLabel} Uhr
+            </span>
+          ) : (
+            <span>Wird geladen…</span>
+          )}
+          {!isPast && timeLabel && (
+            <span style={{ fontSize: 11, opacity: 0.7, background: 'rgba(255,255,255,0.15)', borderRadius: 6, padding: '2px 6px' }}>
+              Prognose
+            </span>
+          )}
         </div>
       )}
 
@@ -153,7 +162,8 @@ export default function RadarScreen({ lat, lon }: Props) {
           bottom: 'calc(env(safe-area-inset-bottom) + 80px)',
           left: 16,
           right: 16,
-          background: 'rgba(11,28,48,0.72)',
+          zIndex: 1000,
+          background: 'rgba(11,28,48,0.80)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           borderRadius: 16,
