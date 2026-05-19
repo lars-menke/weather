@@ -35,7 +35,7 @@ export function WeekForecast({ data, timezone }: WeekForecastProps) {
           const dayLabel = getDayLabel(dateStr, i, timezone);
           const max = Math.round(data.temperature_2m_max[i]);
           const min = Math.round(data.temperature_2m_min[i]);
-          const code = data.weathercode[i];
+          const code = data.weather_code[i];
           const precip = data.precipitation_sum[i];
 
           return (

@@ -9,7 +9,7 @@ interface CurrentWeatherProps {
 }
 
 export function CurrentWeather({ data, cityName, country, timezone }: CurrentWeatherProps) {
-  const info = getWeatherInfo(data.weathercode);
+  const info = getWeatherInfo(data.weather_code);
 
   const now = new Date();
   const timeStr = now.toLocaleTimeString('de-DE', {
@@ -37,7 +37,7 @@ export function CurrentWeather({ data, cityName, country, timezone }: CurrentWea
 
       {/* Weather Icon & Temp */}
       <div className="flex flex-col items-center gap-3">
-        <WeatherIcon code={data.weathercode} size="xl" />
+        <WeatherIcon code={data.weather_code} size="xl" />
         <div className="flex items-start">
           <span className="text-8xl md:text-9xl font-thin text-white drop-shadow-xl leading-none tabular-nums">
             {Math.round(data.temperature_2m)}

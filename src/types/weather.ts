@@ -14,7 +14,7 @@ export interface GeocodingResponse {
 
 export interface CurrentWeatherData {
   temperature_2m: number;
-  weathercode: number;
+  weather_code: number;
   windspeed_10m: number;
   relativehumidity_2m: number;
   apparent_temperature: number;
@@ -23,7 +23,7 @@ export interface CurrentWeatherData {
 
 export interface DailyWeatherData {
   time: string[];
-  weathercode: number[];
+  weather_code: number[];
   temperature_2m_max: number[];
   temperature_2m_min: number[];
   precipitation_sum: number[];

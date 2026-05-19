@@ -78,7 +78,7 @@ export default function App() {
     );
   }
 
-  const weatherCode = weather?.current.weathercode ?? 0;
+  const weatherCode = weather?.current.weather_code ?? 0;
   const info = getWeatherInfo(weatherCode);
 
   return (
