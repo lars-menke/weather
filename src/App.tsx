@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SearchBar } from './components/SearchBar';
-import { CurrentWeather } from './components/CurrentWeather';
-import { WeekForecast } from './components/WeekForecast';
+import { SplashScreen } from './components/SplashScreen';
+import { TabBar } from './components/TabBar';
+import Dashboard from './pages/Dashboard';
+import ForecastPage from './pages/ForecastPage';
 import { fetchWeather, searchCities } from './api/weather';
 import type { WeatherResponse, GeoLocation } from './types/weather';
 import './App.css';
@@ -12,6 +14,8 @@ const DEFAULT_CITY = 'Hamburg';
 const DEFAULT_COUNTRY = 'Deutschland';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [activeTab, setActiveTab] = useState(0);
   const [weather, setWeather] = useState<WeatherResponse | null>(null);
   const [cityName, setCityName] = useState(DEFAULT_CITY);
   const [country, setCountry] = useState(DEFAULT_COUNTRY);
@@ -73,10 +77,14 @@ export default function App() {
     );
   }
 
-  return (
-    <div style={{ minHeight: '100dvh', paddingTop: 'env(safe-area-inset-top)' }}>
+  if (showSplash) {
+    return <SplashScreen onDone={() => setShowSplash(false)} />;
+  }
 
-      {/* Top bar — icon buttons only, no nav chrome */}
+  return (
+    <div style={{ minHeight: '100dvh', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 60, position: 'relative' }}>
+
+      {/* Floating search/GPS buttons top-right */}
       <div style={{
         position: 'absolute', top: 'calc(env(safe-area-inset-top) + 12px)',
         right: 16, zIndex: 10,
@@ -84,15 +92,15 @@ export default function App() {
         <SearchBar onSelect={handleSelect} onGPS={handleGPS} isLoadingGPS={isLoadingGPS} />
       </div>
 
-      {/* Scrollable content */}
-      <div style={{ padding: '60px 20px 40px', display: 'flex', flexDirection: 'column', gap: 28 }}>
+      {/* Page content */}
+      <div style={{ padding: '60px 20px 20px' }}>
 
         {/* Error */}
         {error && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
             background: 'rgba(186,26,26,0.08)', border: '1px solid rgba(186,26,26,0.18)',
-            borderRadius: 12, padding: '12px 14px',
+            borderRadius: 12, padding: '12px 14px', marginBottom: 16,
           }}>
             <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#ba1a1a', flexShrink: 0 }}>warning</span>
             <p style={{ flex: 1, fontSize: 13, fontFamily: 'Inter', color: '#93000a' }}>{error}</p>
@@ -114,22 +122,23 @@ export default function App() {
           </div>
         )}
 
-        {/* Weather content */}
-        {!isLoading && weather && (
-          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            <CurrentWeather
-              data={weather.current}
-              cityName={cityName}
-              country={country}
-              timezone={weather.timezone}
-            />
-            <WeekForecast data={weather.daily} timezone={weather.timezone} />
-            <p style={{ textAlign: 'center', fontSize: 11, fontFamily: 'Inter', color: '#c1c7d3', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-              Open-Meteo · Keine API-Schlüssel erforderlich
-            </p>
-          </div>
+        {/* Dashboard tab */}
+        {activeTab === 0 && weather && !isLoading && (
+          <Dashboard
+            weather={weather}
+            cityName={cityName}
+            country={country}
+            timezone={weather.timezone}
+          />
+        )}
+
+        {/* Forecast tab */}
+        {activeTab === 1 && weather && !isLoading && (
+          <ForecastPage data={weather.daily} timezone={weather.timezone} />
         )}
       </div>
+
+      <TabBar active={activeTab} onChange={setActiveTab} />
     </div>
   );
 }
