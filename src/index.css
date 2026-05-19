@@ -12,8 +12,7 @@ html {
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: linear-gradient(180deg, #d4e3ff 0%, #f8f9ff 100%);
-  background-attachment: fixed;
+  background: #d4e3ff;
   min-height: 100vh;
   min-height: 100dvh;
   color: #0b1c30;

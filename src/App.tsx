@@ -8,6 +8,7 @@ import RadarScreen from './pages/RadarScreen';
 import SettingsScreen from './pages/SettingsScreen';
 import { fetchWeather, searchCities } from './api/weather';
 import type { WeatherResponse, GeoLocation, TempUnit, WindUnit } from './types/weather';
+import { getWeatherBackground, DEFAULT_THEME } from './lib/weatherTheme';
 import './App.css';
 
 const DEFAULT_LAT = 53.5753;
@@ -95,6 +96,15 @@ export default function App() {
     loadWeather(coords.lat, coords.lon, cityName, country, tempUnit, u);
   }
 
+  const theme = weather
+    ? getWeatherBackground(
+        weather.current.weather_code,
+        weather.daily.sunrise?.[0],
+        weather.daily.sunset?.[0],
+        weather.utc_offset_seconds,
+      )
+    : DEFAULT_THEME;
+
   if (showSplash) {
     return <SplashScreen onDone={() => setShowSplash(false)} />;
   }
@@ -102,7 +112,7 @@ export default function App() {
   const isRadar = activeTab === 2;
 
   return (
-    <div style={{ minHeight: '100dvh', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 60, position: 'relative' }}>
+    <div style={{ minHeight: '100dvh', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 60, position: 'relative', background: theme.background, transition: 'background 2s ease' }}>
 
       {/* Radar screen renders outside the padded flow */}
       {isRadar && <RadarScreen lat={coords.lat} lon={coords.lon} />}
@@ -158,6 +168,7 @@ export default function App() {
               timezone={weather.timezone}
               tempUnit={tempUnit}
               windUnit={windUnit}
+              isDark={theme.isDark}
             />
           )}
 
@@ -168,6 +179,7 @@ export default function App() {
               timezone={weather.timezone}
               tempUnit={tempUnit}
               windUnit={windUnit}
+              isDark={theme.isDark}
             />
           )}
 

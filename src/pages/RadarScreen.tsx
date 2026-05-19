@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -14,15 +14,21 @@ interface RainViewerFrame {
 
 interface RainViewerData {
   host: string;
-  radar: { past: RainViewerFrame[] };
+  radar: { past: RainViewerFrame[]; nowcast?: RainViewerFrame[] };
 }
 
 export default function RadarScreen({ lat, lon }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const [radarTime, setRadarTime] = useState('');
-  const [noRadar, setNoRadar] = useState(false);
+  const layersRef = useRef<L.TileLayer[]>([]);
+  const animFrameRef = useRef<number | null>(null);
 
+  const [frames, setFrames] = useState<{ path: string; time: number; host: string }[]>([]);
+  const [frameIndex, setFrameIndex] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const [loaded, setLoaded] = useState(false);
+
+  // Init map once
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
@@ -35,58 +41,79 @@ export default function RadarScreen({ lat, lon }: Props) {
     mapRef.current = map;
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+      attribution: '© <a href="https://openstreetmap.org">OSM</a> | © <a href="https://rainviewer.com">RainViewer</a>',
       maxZoom: 18,
     }).addTo(map);
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Current location pulse
-    L.circle([lat, lon], {
-      radius: 6000,
-      color: '#0060ac',
-      fillColor: '#0060ac',
-      fillOpacity: 0.25,
-      weight: 2,
-    }).addTo(map);
-    L.circle([lat, lon], {
-      radius: 1500,
-      color: '#0060ac',
-      fillColor: '#0060ac',
-      fillOpacity: 0.8,
-      weight: 0,
-    }).addTo(map);
+    // Location marker
+    L.circle([lat, lon], { radius: 5000, color: '#0060ac', fillColor: '#0060ac', fillOpacity: 0.25, weight: 2 }).addTo(map);
+    L.circle([lat, lon], { radius: 1200, color: '#0060ac', fillColor: '#0060ac', fillOpacity: 0.9, weight: 0 }).addTo(map);
 
-    // RainViewer radar overlay
+    // Fetch RainViewer frames
     fetch('https://api.rainviewer.com/public/weather-maps.json')
       .then(r => r.json())
       .then((data: RainViewerData) => {
-        const frames = data.radar?.past ?? [];
-        if (frames.length === 0) { setNoRadar(true); return; }
-        const latest = frames[frames.length - 1];
-        const tileUrl = `${data.host}${latest.path}/256/{z}/{x}/{y}/2/1_1.png`;
-        L.tileLayer(tileUrl, {
-          opacity: 0.55,
-          maxZoom: 18,
-          attribution: '© <a href="https://rainviewer.com">RainViewer</a>',
-        }).addTo(map);
-        const ts = new Date(latest.time * 1000);
-        setRadarTime(ts.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }));
+        const allFrames = [
+          ...(data.radar.past ?? []),
+          ...(data.radar.nowcast ?? []),
+        ].map(f => ({ path: f.path, time: f.time, host: data.host }));
+
+        if (allFrames.length === 0) return;
+
+        // Pre-create one tile layer per frame, all hidden
+        const layers = allFrames.map(f =>
+          L.tileLayer(`${f.host}${f.path}/256/{z}/{x}/{y}/2/1_1.png`, {
+            opacity: 0,
+            maxZoom: 18,
+          }).addTo(map)
+        );
+        layersRef.current = layers;
+        setFrames(allFrames);
+        setFrameIndex(allFrames.length - 1);
+        setLoaded(true);
       })
-      .catch(() => setNoRadar(true));
+      .catch(() => setLoaded(true));
 
     return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       map.remove();
       mapRef.current = null;
+      layersRef.current = [];
     };
   }, [lat, lon]);
+
+  // Show only the active frame
+  useEffect(() => {
+    layersRef.current.forEach((layer, i) => {
+      layer.setOpacity(i === frameIndex ? 0.55 : 0);
+    });
+  }, [frameIndex]);
+
+  // Auto-play
+  const advance = useCallback(() => {
+    setFrameIndex(i => (i + 1) % Math.max(layersRef.current.length, 1));
+  }, []);
+
+  useEffect(() => {
+    if (!playing || frames.length === 0) return;
+    const id = setInterval(advance, 600);
+    return () => clearInterval(id);
+  }, [playing, frames.length, advance]);
+
+  const currentFrame = frames[frameIndex];
+  const timeLabel = currentFrame
+    ? new Date(currentFrame.time * 1000).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
+    : '';
+  const isPast = currentFrame && currentFrame.time * 1000 < Date.now();
 
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 
-      {/* Radar timestamp badge */}
-      {radarTime && (
+      {/* Timestamp badge */}
+      {loaded && frames.length > 0 && (
         <div style={{
           position: 'absolute',
           top: 'calc(env(safe-area-inset-top) + 16px)',
@@ -96,20 +123,77 @@ export default function RadarScreen({ lat, lon }: Props) {
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderRadius: 20,
-          padding: '6px 16px',
+          padding: '6px 14px',
           fontFamily: 'Inter',
           fontSize: 13,
           fontWeight: 500,
           color: '#fff',
           pointerEvents: 'none',
           whiteSpace: 'nowrap',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
         }}>
-          <span className="material-symbols-outlined" style={{ fontSize: 14, verticalAlign: 'middle', marginRight: 6 }}>radar</span>
-          Radar · {radarTime} Uhr
+          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>radar</span>
+          {isPast ? '' : '▸ '}
+          {timeLabel} Uhr
+          {!isPast && <span style={{ fontSize: 11, opacity: 0.7, marginLeft: 4 }}>Prognose</span>}
         </div>
       )}
 
-      {noRadar && (
+      {/* Play/Pause + scrubber */}
+      {loaded && frames.length > 0 && (
+        <div style={{
+          position: 'absolute',
+          bottom: 'calc(env(safe-area-inset-bottom) + 80px)',
+          left: 16,
+          right: 16,
+          background: 'rgba(11,28,48,0.72)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderRadius: 16,
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+        }}>
+          <button
+            onClick={() => setPlaying(p => !p)}
+            aria-label={playing ? 'Pause' : 'Abspielen'}
+            style={{
+              width: 36, height: 36, borderRadius: 18,
+              background: 'rgba(255,255,255,0.15)',
+              border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#fff' }}>
+              {playing ? 'pause' : 'play_arrow'}
+            </span>
+          </button>
+
+          {/* Frame dots */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 3, overflowX: 'hidden' }}>
+            {frames.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => { setPlaying(false); setFrameIndex(i); }}
+                aria-label={`Frame ${i + 1}`}
+                style={{
+                  flex: 1, height: i === frameIndex ? 6 : 3, borderRadius: 9999,
+                  background: i === frameIndex ? '#fff' : 'rgba(255,255,255,0.35)',
+                  border: 'none', cursor: 'pointer', padding: 0,
+                  transition: 'height 0.15s, background 0.15s',
+                  minWidth: 0,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {loaded && frames.length === 0 && (
         <div style={{
           position: 'absolute',
           top: 'calc(env(safe-area-inset-top) + 16px)',

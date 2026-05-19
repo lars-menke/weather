@@ -10,6 +10,7 @@ interface ForecastPageProps {
   timezone: string;
   tempUnit: TempUnit;
   windUnit: WindUnit;
+  isDark?: boolean;
 }
 
 const DAYS_DE: Record<string, string> = {
@@ -25,17 +26,20 @@ function getDayLabel(dateStr: string, index: number, timezone: string): string {
   return DAYS_DE[eng] ?? eng;
 }
 
-export default function ForecastPage({ data, hourly, timezone, tempUnit, windUnit }: ForecastPageProps) {
+export default function ForecastPage({ data, hourly, timezone, tempUnit, windUnit, isDark = false }: ForecastPageProps) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   const globalMax = Math.max(...data.temperature_2m_max);
   const globalMin = Math.min(...data.temperature_2m_min);
   const range = globalMax - globalMin || 1;
 
+  const titleColor = isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30';
+  const mutedColor = isDark ? 'rgba(255,255,255,0.55)' : '#717783';
+
   const glassCard: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.5)',
+    background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.5)',
     borderRadius: 16,
-    border: '1px solid rgba(255,255,255,0.6)',
+    border: isDark ? '1px solid rgba(255,255,255,0.16)' : '1px solid rgba(255,255,255,0.6)',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
     padding: 16,
@@ -47,10 +51,10 @@ export default function ForecastPage({ data, hourly, timezone, tempUnit, windUni
   return (
     <>
       <div className="animate-fade-in">
-        <p style={{ fontFamily: 'Outfit', fontSize: 20, fontWeight: 500, color: '#0b1c30', padding: '0 0 12px 0' }}>
+        <p style={{ fontFamily: 'Outfit', fontSize: 20, fontWeight: 500, color: titleColor, padding: '0 0 12px 0' }}>
           7-Tage-Vorhersage
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 13, color: '#717783', marginBottom: 16 }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 13, color: mutedColor, marginBottom: 16 }}>
           Tippen für Details
         </p>
 

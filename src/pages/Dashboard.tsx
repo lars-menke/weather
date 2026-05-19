@@ -9,6 +9,7 @@ interface DashboardProps {
   timezone: string;
   tempUnit: TempUnit;
   windUnit: WindUnit;
+  isDark?: boolean;
 }
 
 function getMatIconLocal(code: number) { return getMatIcon(code); }
@@ -76,7 +77,7 @@ function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds }: { sunriseIso: strin
   );
 }
 
-export default function Dashboard({ weather, cityName, country, timezone, tempUnit, windUnit }: DashboardProps) {
+export default function Dashboard({ weather, cityName, country, timezone, tempUnit, windUnit, isDark = false }: DashboardProps) {
   const { current, daily, hourly } = weather;
   const info = getWeatherInfo(current.weather_code);
 
@@ -100,10 +101,14 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
   const tempSuffix = tempUnit === 'fahrenheit' ? '°F' : '°C';
   const windSuffix = windUnit === 'mph' ? 'mph' : 'km/h';
 
+  const c = isDark
+    ? { primary: 'rgba(255,255,255,0.95)', muted: 'rgba(255,255,255,0.6)', accent: '#fff', divider: 'rgba(255,255,255,0.2)' }
+    : { primary: '#0b1c30',               muted: '#717783',                accent: '#0060ac', divider: 'rgba(0,0,0,0.12)' };
+
   const glassCard: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.5)',
+    background: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.5)',
     borderRadius: 16,
-    border: '1px solid rgba(255,255,255,0.6)',
+    border: isDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.6)',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
   };
@@ -113,40 +118,40 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
 
       {/* Hero */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, paddingTop: 8 }}>
-        <p style={{ fontFamily: 'Inter', fontSize: 15, color: '#414751', fontWeight: 500 }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 15, color: c.muted, fontWeight: 500 }}>
           {cityName}{country ? `, ${country}` : ''}
         </p>
 
         <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 4, lineHeight: 1 }}>
-          <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 112, letterSpacing: '-0.04em', color: '#0060ac', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 112, letterSpacing: '-0.04em', color: c.accent, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
             {Math.round(current.temperature_2m)}
           </span>
-          <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 44, color: '#0060ac', marginTop: 12 }}>
+          <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 44, color: c.accent, marginTop: 12 }}>
             {tempSuffix}
           </span>
         </div>
 
-        <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', marginTop: 4 }}>
+        <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: c.primary, marginTop: 4 }}>
           {info.description}
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 14, color: '#717783', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 14, color: c.muted, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
           Gefühlt {Math.round(current.apparent_temperature)}{tempSuffix}
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 13, color: '#717783', marginTop: 2 }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 13, color: c.muted, marginTop: 2 }}>
           {dateStr}
         </p>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0060ac' }}>air</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: '#414751', fontVariantNumeric: 'tabular-nums' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, color: c.accent }}>air</span>
+            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>
               {Math.round(current.windspeed_10m)} {windSuffix}
             </span>
           </div>
-          <div style={{ width: 1, height: 28, background: 'rgba(0,0,0,0.12)' }} />
+          <div style={{ width: 1, height: 28, background: c.divider }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0060ac' }}>humidity_percentage</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: '#414751', fontVariantNumeric: 'tabular-nums' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, color: c.accent }}>humidity_percentage</span>
+            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>
               {current.relativehumidity_2m}%
             </span>
           </div>
