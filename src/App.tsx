@@ -84,7 +84,7 @@ export default function App() {
 
       {/* Sticky header */}
       <header className="glass-header sticky top-0 z-50 w-full">
-        <div className="max-w-lg mx-auto px-6 h-16 flex items-center">
+        <div className="px-4 h-14 flex items-center">
           <SearchBar
             cityName={cityName}
             onSelect={handleSelect}
@@ -95,7 +95,7 @@ export default function App() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-lg mx-auto px-6 pt-8 pb-12 flex flex-col gap-8">
+      <main className="px-4 pt-6 pb-10 flex flex-col gap-6">
 
         {/* Error banner */}
         {error && (

@@ -6,8 +6,8 @@ interface WeekForecastProps {
 }
 
 const DAYS_DE: Record<string, string> = {
-  Monday: 'Montag', Tuesday: 'Dienstag', Wednesday: 'Mittwoch',
-  Thursday: 'Donnerstag', Friday: 'Freitag', Saturday: 'Samstag', Sunday: 'Sonntag',
+  Monday: 'Mo', Tuesday: 'Di', Wednesday: 'Mi',
+  Thursday: 'Do', Friday: 'Fr', Saturday: 'Sa', Sunday: 'So',
 };
 
 function getDayLabel(dateStr: string, index: number, timezone: string): string {
@@ -15,7 +15,7 @@ function getDayLabel(dateStr: string, index: number, timezone: string): string {
   if (index === 1) return 'Morgen';
   const date = new Date(dateStr + 'T12:00:00');
   const eng = date.toLocaleDateString('en-US', { timeZone: timezone, weekday: 'long' });
-  return DAYS_DE[eng] ?? eng;
+  return DAYS_DE[eng] ?? eng.slice(0, 2);
 }
 
 function getMatIcon(code: number): { icon: string; color: string } {
@@ -69,34 +69,34 @@ export function WeekForecast({ data, timezone }: WeekForecastProps) {
           return (
             <div
               key={dateStr}
-              className="flex items-center px-5 py-3.5 transition-colors hover:bg-white/20"
+              className="flex items-center px-4 py-3"
               style={i < data.time.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.25)' } : {}}
             >
-              {/* Day */}
+              {/* Day — fixed width, no wrapping */}
               <span
-                className="w-24 text-sm font-['Inter'] font-medium flex-shrink-0"
-                style={{ color: i === 0 ? '#0060ac' : '#0b1c30' }}
+                className="text-sm font-['Inter'] font-medium flex-shrink-0"
+                style={{ color: i === 0 ? '#0060ac' : '#0b1c30', width: 52 }}
               >
                 {dayLabel}
               </span>
 
               {/* Icon */}
               <span
-                className="material-symbols-outlined mat-fill w-8 flex-shrink-0 text-center"
-                style={{ color, fontSize: '22px' }}
+                className="material-symbols-outlined mat-fill flex-shrink-0"
+                style={{ color, fontSize: '20px', width: 28 }}
               >
                 {icon}
               </span>
 
               {/* Temp bar + values */}
-              <div className="flex items-center gap-2.5 flex-1 min-w-0 justify-end">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
                 <span
-                  className="text-sm font-['Inter'] tabular-nums w-7 text-right flex-shrink-0"
-                  style={{ color: '#414751', opacity: 0.6 }}
+                  className="text-sm font-['Inter'] tabular-nums text-right flex-shrink-0"
+                  style={{ color: '#414751', opacity: 0.6, width: 26 }}
                 >
                   {min}°
                 </span>
-                <div className="relative h-1.5 flex-1 rounded-full" style={{ background: 'rgba(0,0,0,0.08)', minWidth: 48, maxWidth: 80 }}>
+                <div className="relative h-1.5 flex-1 rounded-full min-w-0" style={{ background: 'rgba(0,0,0,0.08)' }}>
                   <div
                     className="absolute top-0 h-full rounded-full"
                     style={{
@@ -107,8 +107,8 @@ export function WeekForecast({ data, timezone }: WeekForecastProps) {
                   />
                 </div>
                 <span
-                  className="text-sm font-['Inter'] font-semibold tabular-nums w-7 flex-shrink-0"
-                  style={{ color: '#0b1c30' }}
+                  className="text-sm font-['Inter'] font-semibold tabular-nums flex-shrink-0"
+                  style={{ color: '#0b1c30', width: 26 }}
                 >
                   {max}°
                 </span>

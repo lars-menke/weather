@@ -49,8 +49,8 @@ export function CurrentWeather({ data, cityName, country, timezone }: CurrentWea
       </section>
 
       {/* Details strip */}
-      <section className="w-full glass-card rounded-xl p-5">
-        <div className="flex justify-around items-center gap-2">
+      <section className="w-full glass-card rounded-xl px-4 py-4">
+        <div className="flex justify-around items-center gap-1">
           <DetailItem
             icon="air"
             label="Wind"
