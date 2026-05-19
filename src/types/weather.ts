@@ -29,9 +29,17 @@ export interface DailyWeatherData {
   precipitation_sum: number[];
 }
 
+export interface HourlyWeatherData {
+  time: string[];
+  temperature_2m: number[];
+  weather_code: number[];
+  precipitation_probability: number[];
+}
+
 export interface WeatherResponse {
   current: CurrentWeatherData;
   daily: DailyWeatherData;
+  hourly: HourlyWeatherData;
   timezone: string;
   timezone_abbreviation: string;
   utc_offset_seconds: number;

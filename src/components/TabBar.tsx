@@ -1,0 +1,71 @@
+interface TabBarProps {
+  active: number;
+  onChange: (i: number) => void;
+}
+
+const TABS = [
+  { icon: 'home', iconFilled: 'home', label: 'Dashboard' },
+  { icon: 'calendar_month', iconFilled: 'calendar_month', label: 'Vorhersage' },
+];
+
+export function TabBar({ active, onChange }: TabBarProps) {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
+        background: 'rgba(248,249,255,0.92)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(0,0,0,0.08)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        display: 'flex',
+        alignItems: 'stretch',
+      }}
+    >
+      {TABS.map((tab, i) => {
+        const isActive = active === i;
+        return (
+          <button
+            key={tab.label}
+            onClick={() => onChange(i)}
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 3,
+              padding: '10px 0',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: isActive ? '#0060ac' : 'rgba(113,119,131,0.7)',
+              transition: 'color 0.2s',
+            }}
+          >
+            <span
+              className={isActive ? 'material-symbols-outlined mat-fill' : 'material-symbols-outlined'}
+              style={{ fontSize: 24 }}
+            >
+              {tab.icon}
+            </span>
+            <span
+              style={{
+                fontFamily: 'Inter',
+                fontSize: 10,
+                fontWeight: isActive ? 600 : 400,
+                letterSpacing: '0.01em',
+              }}
+            >
+              {tab.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}

@@ -15,7 +15,8 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherRes
     `?latitude=${lat}&longitude=${lon}` +
     `&current=temperature_2m,weather_code,windspeed_10m,relativehumidity_2m,apparent_temperature` +
     `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum` +
-    `&timezone=auto&forecast_days=7`;
+    `&hourly=temperature_2m,weather_code,precipitation_probability&forecast_days=7` +
+    `&timezone=auto`;
   const res = await fetch(url);
   if (!res.ok) throw new Error('Weather API error');
   return res.json();
