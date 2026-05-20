@@ -1,6 +1,7 @@
 export interface WeatherTheme {
   background: string;
   isDark: boolean;
+  isNight: boolean;
 }
 
 function toUtcMs(isoLocal: string, utcOffset: number): number {
@@ -32,56 +33,57 @@ export function getWeatherBackground(
   // Night — overrides all conditions except storm
   if (night && code < 95) {
     if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) {
-      return { background: 'linear-gradient(175deg, #0d1c2e 0%, #1e3045 100%)', isDark: true };
+      return { background: 'linear-gradient(175deg, #0d1c2e 0%, #1e3045 100%)', isDark: true, isNight: true };
     }
     if ((code >= 71 && code <= 77) || code === 85 || code === 86) {
-      return { background: 'linear-gradient(175deg, #1a2a44 0%, #2e4460 100%)', isDark: true };
+      return { background: 'linear-gradient(175deg, #1a2a44 0%, #2e4460 100%)', isDark: true, isNight: true };
     }
-    return { background: 'linear-gradient(175deg, #152030 0%, #2a4060 100%)', isDark: true };
+    return { background: 'linear-gradient(175deg, #152030 0%, #2a4060 100%)', isDark: true, isNight: true };
   }
 
   // Thunderstorm
   if (code >= 95) {
-    return { background: 'linear-gradient(175deg, #252e38 0%, #3e5060 100%)', isDark: true };
+    return { background: 'linear-gradient(175deg, #252e38 0%, #3e5060 100%)', isDark: true, isNight: false };
   }
 
   // Snow
   if ((code >= 71 && code <= 77) || code === 85 || code === 86) {
-    return { background: 'linear-gradient(175deg, #a8cce4 0%, #e4f2fc 100%)', isDark: false };
+    return { background: 'linear-gradient(175deg, #a8cce4 0%, #e4f2fc 100%)', isDark: false, isNight: false };
   }
 
   // Rain / showers
   if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) {
-    return { background: 'linear-gradient(175deg, #3e6278 0%, #8aaec4 100%)', isDark: false };
+    return { background: 'linear-gradient(175deg, #3e6278 0%, #8aaec4 100%)', isDark: false, isNight: false };
   }
 
   // Drizzle
   if (code >= 51 && code <= 57) {
-    return { background: 'linear-gradient(175deg, #527890 0%, #a4c0d0 100%)', isDark: false };
+    return { background: 'linear-gradient(175deg, #527890 0%, #a4c0d0 100%)', isDark: false, isNight: false };
   }
 
   // Fog
   if (code === 45 || code === 48) {
-    return { background: 'linear-gradient(175deg, #8298a8 0%, #c8d8e2 100%)', isDark: false };
+    return { background: 'linear-gradient(175deg, #8298a8 0%, #c8d8e2 100%)', isDark: false, isNight: false };
   }
 
   // Overcast
   if (code === 3) {
-    return { background: 'linear-gradient(175deg, #6e8898 0%, #bcccd8 100%)', isDark: false };
+    return { background: 'linear-gradient(175deg, #6e8898 0%, #bcccd8 100%)', isDark: false, isNight: false };
   }
 
   // Partly cloudy
   if (code === 2) {
-    if (golden) return { background: 'linear-gradient(175deg, #c87040 0%, #eebc7a 50%, #c8ddf0 100%)', isDark: false };
-    return { background: 'linear-gradient(175deg, #5090bc 0%, #c8e0f4 100%)', isDark: false };
+    if (golden) return { background: 'linear-gradient(175deg, #c87040 0%, #eebc7a 50%, #c8ddf0 100%)', isDark: false, isNight: false };
+    return { background: 'linear-gradient(175deg, #5090bc 0%, #c8e0f4 100%)', isDark: false, isNight: false };
   }
 
   // Clear sky (0 or 1)
-  if (golden) return { background: 'linear-gradient(175deg, #d86830 0%, #f5a84e 40%, #d4e3ff 100%)', isDark: false };
-  return { background: 'linear-gradient(175deg, #2e9ad4 0%, #d4e3ff 100%)', isDark: false };
+  if (golden) return { background: 'linear-gradient(175deg, #d86830 0%, #f5a84e 40%, #d4e3ff 100%)', isDark: false, isNight: false };
+  return { background: 'linear-gradient(175deg, #2e9ad4 0%, #d4e3ff 100%)', isDark: false, isNight: false };
 }
 
 export const DEFAULT_THEME: WeatherTheme = {
   background: 'linear-gradient(175deg, #2e9ad4 0%, #d4e3ff 100%)',
   isDark: false,
+  isNight: false,
 };

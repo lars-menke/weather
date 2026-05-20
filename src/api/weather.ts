@@ -20,7 +20,7 @@ export async function fetchWeather(
     `?latitude=${lat}&longitude=${lon}` +
     `&current=temperature_2m,weather_code,windspeed_10m,relativehumidity_2m,apparent_temperature` +
     `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset` +
-    `&hourly=temperature_2m,weather_code,precipitation_probability,windspeed_10m,uv_index,surface_pressure,visibility` +
+    `&hourly=temperature_2m,weather_code,precipitation_probability,precipitation,windspeed_10m,uv_index,surface_pressure,visibility` +
     `&forecast_days=7` +
     `&timezone=auto` +
     `&temperature_unit=${tempUnit}` +

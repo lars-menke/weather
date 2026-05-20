@@ -123,17 +123,23 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
                 const timeLabel = (hourly.time[idx] ?? '').slice(11, 16);
                 const temp = Math.round(hourly.temperature_2m[idx] ?? 0);
                 const hCode = hourly.weather_code[idx] ?? 0;
-                const precip = hourly.precipitation_probability[idx] ?? 0;
+                const precipMm   = hourly.precipitation[idx] ?? 0;
+                const precipProb = hourly.precipitation_probability[idx] ?? 0;
                 const { icon: hIcon, color: hColor } = getMatIcon(hCode);
                 return (
                   <div key={idx} style={{ minWidth: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 10px', gap: 4 }}>
                     <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783' }}>{h === 0 ? '00:00' : timeLabel}</span>
                     <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color: hColor }}>{hIcon}</span>
                     <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
-                    {precip > 0 && (
+                    {precipMm > 0.05 && (
+                      <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>
+                        {precipMm.toFixed(1)}mm
+                      </span>
+                    )}
+                    {precipMm <= 0.05 && precipProb > 0 && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#3b82f6', flexShrink: 0 }} />
-                        <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>{precip}%</span>
+                        <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>{precipProb}%</span>
                       </div>
                     )}
                   </div>
@@ -184,6 +190,17 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
               </div>
               <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{visibilityAvg}</p>
               <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>km</p>
+            </div>
+
+            <div style={{ ...glassCard, padding: 16, gridColumn: '1 / -1' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <span className="material-symbols-outlined mat-fill" style={{ fontSize: 18, color: '#3b82f6' }}>water_drop</span>
+                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>Niederschlag</span>
+              </div>
+              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>
+                {(daily.precipitation_sum[dayIndex] ?? 0).toFixed(1)} mm
+              </p>
+              <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>Tagessumme</p>
             </div>
 
           </div>

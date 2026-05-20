@@ -36,10 +36,18 @@ export interface HourlyWeatherData {
   temperature_2m: number[];
   weather_code: number[];
   precipitation_probability: number[];
+  precipitation: number[];
   windspeed_10m: number[];
   uv_index: number[];
   surface_pressure: number[];
   visibility: number[];
+}
+
+export interface Favorite {
+  lat: number;
+  lon: number;
+  city: string;
+  country: string;
 }
 
 export interface WeatherResponse {

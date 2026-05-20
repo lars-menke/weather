@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { SearchBar } from './components/SearchBar';
 import { SplashScreen } from './components/SplashScreen';
 import { TabBar } from './components/TabBar';
+import WeatherAnimation from './components/WeatherAnimation';
 import Dashboard from './pages/Dashboard';
 import ForecastPage from './pages/ForecastPage';
 import RadarScreen from './pages/RadarScreen';
 import SettingsScreen from './pages/SettingsScreen';
 import { fetchWeather, searchCities } from './api/weather';
-import type { WeatherResponse, GeoLocation, TempUnit, WindUnit } from './types/weather';
+import type { WeatherResponse, GeoLocation, TempUnit, WindUnit, Favorite } from './types/weather';
 import { getWeatherBackground, DEFAULT_THEME } from './lib/weatherTheme';
 import './App.css';
 
@@ -18,6 +19,21 @@ const DEFAULT_COUNTRY = 'Deutschland';
 
 function loadPref<T extends string>(key: string, fallback: T): T {
   return (localStorage.getItem(key) as T | null) ?? fallback;
+}
+
+function loadLastLocation() {
+  try {
+    const raw = localStorage.getItem('lastLocation');
+    if (!raw) return null;
+    const loc = JSON.parse(raw) as Partial<Favorite>;
+    if (loc.lat && loc.lon && loc.city) return loc as Favorite;
+  } catch {}
+  return null;
+}
+
+function loadFavorites(): Favorite[] {
+  try { return JSON.parse(localStorage.getItem('favorites') ?? '[]'); }
+  catch { return []; }
 }
 
 export default function App() {
@@ -32,6 +48,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [tempUnit, setTempUnit] = useState<TempUnit>(() => loadPref('tempUnit', 'celsius'));
   const [windUnit, setWindUnit] = useState<WindUnit>(() => loadPref('windUnit', 'kmh'));
+  const [favorites, setFavorites] = useState<Favorite[]>(loadFavorites);
 
   const loadWeather = useCallback(async (lat: number, lon: number, city: string, countryName: string, tu: TempUnit, wu: WindUnit) => {
     setIsLoading(true);
@@ -42,6 +59,7 @@ export default function App() {
       setCityName(city);
       setCountry(countryName);
       setCoords({ lat, lon });
+      localStorage.setItem('lastLocation', JSON.stringify({ lat, lon, city, country: countryName }));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Fehler beim Laden der Wetterdaten');
     } finally {
@@ -50,11 +68,32 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    loadWeather(DEFAULT_LAT, DEFAULT_LON, DEFAULT_CITY, DEFAULT_COUNTRY, tempUnit, windUnit);
+    const last = loadLastLocation();
+    const loc = last ?? { lat: DEFAULT_LAT, lon: DEFAULT_LON, city: DEFAULT_CITY, country: DEFAULT_COUNTRY };
+    loadWeather(loc.lat, loc.lon, loc.city, loc.country, tempUnit, windUnit);
   }, [loadWeather]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleSelect(loc: GeoLocation) {
     loadWeather(loc.latitude, loc.longitude, loc.name, loc.country, tempUnit, windUnit);
+  }
+
+  function handleSelectFavorite(fav: Favorite) {
+    loadWeather(fav.lat, fav.lon, fav.city, fav.country, tempUnit, windUnit);
+  }
+
+  function handleRemoveFavorite(fav: Favorite) {
+    const next = favorites.filter(f => !(f.lat === fav.lat && f.lon === fav.lon));
+    localStorage.setItem('favorites', JSON.stringify(next));
+    setFavorites(next);
+  }
+
+  function toggleFavorite() {
+    const isFav = favorites.some(f => f.lat === coords.lat && f.lon === coords.lon);
+    const next = isFav
+      ? favorites.filter(f => !(f.lat === coords.lat && f.lon === coords.lon))
+      : [...favorites, { lat: coords.lat, lon: coords.lon, city: cityName, country }];
+    localStorage.setItem('favorites', JSON.stringify(next));
+    setFavorites(next);
   }
 
   function handleGPS() {
@@ -105,6 +144,8 @@ export default function App() {
       )
     : DEFAULT_THEME;
 
+  const isFavorite = favorites.some(f => f.lat === coords.lat && f.lon === coords.lon);
+
   if (showSplash) {
     return <SplashScreen onDone={() => setShowSplash(false)} />;
   }
@@ -114,13 +155,47 @@ export default function App() {
   return (
     <div style={{ minHeight: '100dvh', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 60, position: 'relative', background: theme.background, transition: 'background 2s ease' }}>
 
+      {/* Weather particle animation */}
+      {weather && (
+        <WeatherAnimation code={weather.current.weather_code} isNight={theme.isNight} />
+      )}
+
       {/* Radar screen renders outside the padded flow */}
       {isRadar && <RadarScreen lat={coords.lat} lon={coords.lon} />}
+
+      {/* Favourite star button — left side, tabs 0+1 */}
+      {activeTab <= 1 && (
+        <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top) + 12px)', left: 16, zIndex: 10 }}>
+          <button
+            onClick={toggleFavorite}
+            aria-label={isFavorite ? 'Aus Favoriten entfernen' : 'Als Favorit speichern'}
+            style={{
+              width: 44, height: 44, borderRadius: 22, border: 'none',
+              background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <span
+              className={`material-symbols-outlined${isFavorite ? ' mat-fill' : ''}`}
+              style={{ fontSize: 20, color: isFavorite ? '#f59e0b' : '#414751' }}
+            >
+              star
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Search bar — hidden on Radar and Settings tabs */}
       {activeTab <= 1 && (
         <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top) + 12px)', right: 16, zIndex: 10 }}>
-          <SearchBar onSelect={handleSelect} onGPS={handleGPS} isLoadingGPS={isLoadingGPS} />
+          <SearchBar
+            onSelect={handleSelect}
+            onGPS={handleGPS}
+            isLoadingGPS={isLoadingGPS}
+            favorites={favorites}
+            onSelectFavorite={handleSelectFavorite}
+            onRemoveFavorite={handleRemoveFavorite}
+          />
         </div>
       )}
 
