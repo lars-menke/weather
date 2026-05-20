@@ -8,7 +8,6 @@ import ForecastPage from './pages/ForecastPage';
 import RadarScreen from './pages/RadarScreen';
 import SettingsScreen from './pages/SettingsScreen';
 import { fetchWeather, searchCities, fetchAlerts } from './api/weather';
-import AlertBanner from './components/AlertBanner';
 import type { WeatherResponse, GeoLocation, TempUnit, WindUnit, Favorite, WeatherAlert } from './types/weather';
 import { getWeatherBackground, DEFAULT_THEME } from './lib/weatherTheme';
 import './App.css';
@@ -214,13 +213,6 @@ export default function App() {
       {!isRadar && (
         <div style={{ padding: '68px 20px 20px' }}>
 
-          {/* Weather alerts (DWD via Bright Sky) */}
-          {alerts.length > 0 && !isLoading && (
-            <div style={{ marginBottom: 16 }}>
-              <AlertBanner alerts={alerts} isDark={theme.isDark} />
-            </div>
-          )}
-
           {/* Error banner */}
           {error && (
             <div style={{
@@ -263,6 +255,7 @@ export default function App() {
               windUnit={windUnit}
               lat={coords.lat}
               lon={coords.lon}
+              alerts={alerts}
               isDark={theme.isDark}
               onNavigateToRadar={() => setActiveTab(2)}
             />

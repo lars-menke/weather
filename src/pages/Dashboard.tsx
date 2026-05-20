@@ -1,7 +1,8 @@
 import { getWeatherInfo } from '../components/WeatherIcon';
 import { getMatIcon } from '../lib/weatherCodes';
 import RadarTile from '../components/RadarTile';
-import type { WeatherResponse, TempUnit, WindUnit } from '../types/weather';
+import AlertBanner from '../components/AlertBanner';
+import type { WeatherResponse, TempUnit, WindUnit, WeatherAlert } from '../types/weather';
 
 interface DashboardProps {
   weather: WeatherResponse;
@@ -12,6 +13,7 @@ interface DashboardProps {
   windUnit: WindUnit;
   lat: number;
   lon: number;
+  alerts: WeatherAlert[];
   isDark?: boolean;
   onNavigateToRadar: () => void;
 }
@@ -81,7 +83,7 @@ function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds, isDark }: { sunriseIs
   );
 }
 
-export default function Dashboard({ weather, cityName, country, timezone, tempUnit, windUnit, lat, lon, isDark = false, onNavigateToRadar }: DashboardProps) {
+export default function Dashboard({ weather, cityName, country, timezone, tempUnit, windUnit, lat, lon, alerts, isDark = false, onNavigateToRadar }: DashboardProps) {
   const { current, daily, hourly } = weather;
   const info = getWeatherInfo(current.weather_code);
 
@@ -160,6 +162,21 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Warnings */}
+      <div>
+        <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: c.muted, marginBottom: 8, paddingLeft: 4 }}>
+          Warnungen
+        </p>
+        {alerts.length === 0 ? (
+          <div style={{ ...glassCard, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color: '#10b981', flexShrink: 0 }}>check_circle</span>
+            <p style={{ fontFamily: 'Inter', fontSize: 14, color: c.muted }}>Keine aktiven Warnungen</p>
+          </div>
+        ) : (
+          <AlertBanner alerts={alerts} isDark={isDark} />
+        )}
       </div>
 
       {/* Hourly strip */}
