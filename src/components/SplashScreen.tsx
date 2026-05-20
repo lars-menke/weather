@@ -32,7 +32,7 @@ export function SplashScreen({ onDone }: SplashScreenProps) {
         gap: 16,
       }}
     >
-      <span style={{ fontSize: 80, lineHeight: 1, userSelect: 'none' }}>☀️</span>
+      <span className="material-symbols-outlined mat-fill" style={{ fontSize: 80, color: '#f59e0b', lineHeight: 1, userSelect: 'none' }}>wb_sunny</span>
       <p
         style={{
           fontFamily: 'Outfit',
@@ -43,7 +43,7 @@ export function SplashScreen({ onDone }: SplashScreenProps) {
           marginTop: 8,
         }}
       >
-        Wetter
+        Weather
       </p>
       <p
         style={{

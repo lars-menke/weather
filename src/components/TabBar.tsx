@@ -4,8 +4,10 @@ interface TabBarProps {
 }
 
 const TABS = [
-  { icon: 'home', iconFilled: 'home', label: 'Dashboard' },
-  { icon: 'calendar_month', iconFilled: 'calendar_month', label: 'Vorhersage' },
+  { icon: 'home', label: 'Wetter' },
+  { icon: 'calendar_month', label: 'Vorhersage' },
+  { icon: 'radar', label: 'Radar' },
+  { icon: 'settings', label: 'Einstellungen' },
 ];
 
 export function TabBar({ active, onChange }: TabBarProps) {
@@ -32,6 +34,8 @@ export function TabBar({ active, onChange }: TabBarProps) {
           <button
             key={tab.label}
             onClick={() => onChange(i)}
+            aria-label={tab.label}
+            aria-current={isActive ? 'page' : undefined}
             style={{
               flex: 1,
               display: 'flex',
@@ -45,6 +49,7 @@ export function TabBar({ active, onChange }: TabBarProps) {
               cursor: 'pointer',
               color: isActive ? '#0060ac' : 'rgba(113,119,131,0.7)',
               transition: 'color 0.2s',
+              minHeight: 56,
             }}
           >
             <span
@@ -53,14 +58,7 @@ export function TabBar({ active, onChange }: TabBarProps) {
             >
               {tab.icon}
             </span>
-            <span
-              style={{
-                fontFamily: 'Inter',
-                fontSize: 10,
-                fontWeight: isActive ? 600 : 400,
-                letterSpacing: '0.01em',
-              }}
-            >
+            <span style={{ fontFamily: 'Inter', fontSize: 10, fontWeight: isActive ? 600 : 400, letterSpacing: '0.01em' }}>
               {tab.label}
             </span>
           </button>

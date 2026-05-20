@@ -12,8 +12,7 @@ html {
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: linear-gradient(180deg, #d4e3ff 0%, #f8f9ff 100%);
-  background-attachment: fixed;
+  background: #d4e3ff;
   min-height: 100vh;
   min-height: 100dvh;
   color: #0b1c30;
@@ -80,3 +79,58 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in { animation: fade-in 0.5s ease-out both; }
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #0060ac;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@keyframes rain-fall {
+  0%   { transform: rotate(8deg) translateY(-30px); opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 0.6; }
+  100% { transform: rotate(8deg) translateY(110vh); opacity: 0; }
+}
+
+@keyframes snow-drift {
+  0%   { transform: translateY(-20px) translateX(0px); opacity: 0; }
+  8%   { opacity: 0.9; }
+  50%  { transform: translateY(50vh) translateX(18px); }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(110vh) translateX(-5px); opacity: 0; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 0.1; transform: scale(0.6); }
+}
+
+@keyframes sun-pulse {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.07); }
+}
+
+@keyframes sun-ray-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes lightning-flash {
+  0%, 87%, 93%, 100% { opacity: 0; }
+  89%, 91% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
