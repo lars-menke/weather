@@ -86,6 +86,7 @@ function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds, isDark }: { sunriseIs
 export default function Dashboard({ weather, cityName, country, timezone, tempUnit, windUnit, lat, lon, alerts, isDark = false, onNavigateToRadar }: DashboardProps) {
   const { current, daily, hourly } = weather;
   const info = getWeatherInfo(current.weather_code);
+  const { icon: currentIcon, color: currentColor } = getMatIconLocal(current.weather_code);
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('de-DE', {
@@ -127,6 +128,11 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
         <p style={{ fontFamily: 'Inter', fontSize: 15, color: c.muted, fontWeight: 500 }}>
           {cityName}{country ? `, ${country}` : ''}
         </p>
+
+        <span
+          className={`material-symbols-outlined mat-fill${currentIcon === 'sunny' ? ' sun-animate' : ''}`}
+          style={{ fontSize: 72, color: currentColor, lineHeight: 1, marginTop: 8 }}
+        >{currentIcon}</span>
 
         <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 4, lineHeight: 1 }}>
           <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 112, letterSpacing: '-0.04em', color: c.accent, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
