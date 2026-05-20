@@ -131,17 +131,23 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
                     <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783' }}>{h === 0 ? '00:00' : timeLabel}</span>
                     <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color: hColor }}>{hIcon}</span>
                     <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
-                    {precipMm > 0.05 && (
-                      <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>
-                        {precipMm.toFixed(1)}mm
-                      </span>
-                    )}
-                    {precipMm <= 0.05 && precipProb > 0 && (
+                    {precipMm > 0.05 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                        <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>
+                          {precipMm.toFixed(1)}mm
+                        </span>
+                        {precipProb > 0 && (
+                          <span style={{ fontFamily: 'Inter', fontSize: 10, color: '#3b82f6', fontVariantNumeric: 'tabular-nums', opacity: 0.75 }}>
+                            {precipProb}%
+                          </span>
+                        )}
+                      </div>
+                    ) : precipProb > 0 ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#3b82f6', flexShrink: 0 }} />
                         <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>{precipProb}%</span>
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 );
               })}

@@ -9,9 +9,10 @@ interface SearchBarProps {
   favorites: Favorite[];
   onSelectFavorite: (fav: Favorite) => void;
   onRemoveFavorite: (fav: Favorite) => void;
+  isDark?: boolean;
 }
 
-export function SearchBar({ onSelect, onGPS, isLoadingGPS, favorites, onSelectFavorite, onRemoveFavorite }: SearchBarProps) {
+export function SearchBar({ onSelect, onGPS, isLoadingGPS, favorites, onSelectFavorite, onRemoveFavorite, isDark = false }: SearchBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<GeoLocation[]>([]);
@@ -216,11 +217,12 @@ export function SearchBar({ onSelect, onGPS, isLoadingGPS, favorites, onSelectFa
           aria-label="Stadt suchen"
           style={{
             width: 44, height: 44, borderRadius: 22, border: 'none',
-            background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.06)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer',
           }}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#414751' }}>search</span>
+          <span className="material-symbols-outlined" style={{ fontSize: 20, color: isDark ? 'rgba(255,255,255,0.9)' : '#414751' }}>search</span>
         </button>
         <button
           onClick={onGPS}
@@ -228,13 +230,14 @@ export function SearchBar({ onSelect, onGPS, isLoadingGPS, favorites, onSelectFa
           aria-label={isLoadingGPS ? 'Standort wird ermittelt' : 'Aktuellen Standort verwenden'}
           style={{
             width: 44, height: 44, borderRadius: 22, border: 'none',
-            background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.06)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', opacity: isLoadingGPS ? 0.4 : 1,
           }}
         >
           {isLoadingGPS
-            ? <span className="material-symbols-outlined animate-spin" style={{ fontSize: 18, color: '#414751' }}>autorenew</span>
-            : <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#414751' }}>my_location</span>
+            ? <span className="material-symbols-outlined animate-spin" style={{ fontSize: 18, color: isDark ? 'rgba(255,255,255,0.9)' : '#414751' }}>autorenew</span>
+            : <span className="material-symbols-outlined" style={{ fontSize: 20, color: isDark ? 'rgba(255,255,255,0.9)' : '#414751' }}>my_location</span>
           }
         </button>
       </div>

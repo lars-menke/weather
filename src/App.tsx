@@ -171,13 +171,14 @@ export default function App() {
             aria-label={isFavorite ? 'Aus Favoriten entfernen' : 'Als Favorit speichern'}
             style={{
               width: 44, height: 44, borderRadius: 22, border: 'none',
-              background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: theme.isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.06)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}
           >
             <span
               className={`material-symbols-outlined${isFavorite ? ' mat-fill' : ''}`}
-              style={{ fontSize: 20, color: isFavorite ? '#f59e0b' : '#414751' }}
+              style={{ fontSize: 20, color: isFavorite ? '#f59e0b' : (theme.isDark ? 'rgba(255,255,255,0.9)' : '#414751') }}
             >
               star
             </span>
@@ -195,6 +196,7 @@ export default function App() {
             favorites={favorites}
             onSelectFavorite={handleSelectFavorite}
             onRemoveFavorite={handleRemoveFavorite}
+            isDark={theme.isDark}
           />
         </div>
       )}
@@ -264,6 +266,7 @@ export default function App() {
               windUnit={windUnit}
               onTempUnit={handleTempUnit}
               onWindUnit={handleWindUnit}
+              isDark={theme.isDark}
             />
           )}
 
