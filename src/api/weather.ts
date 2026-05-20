@@ -1,4 +1,15 @@
-import type { GeocodingResponse, GeoLocation, WeatherResponse, TempUnit, WindUnit } from '../types/weather';
+import type { GeocodingResponse, GeoLocation, WeatherResponse, TempUnit, WindUnit, WeatherAlert } from '../types/weather';
+
+export async function fetchAlerts(lat: number, lon: number): Promise<WeatherAlert[]> {
+  try {
+    const res = await fetch(`https://api.brightsky.dev/alerts?lat=${lat}&lon=${lon}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.alerts ?? []) as WeatherAlert[];
+  } catch {
+    return [];
+  }
+}
 
 export async function searchCities(query: string): Promise<GeoLocation[]> {
   if (!query.trim()) return [];

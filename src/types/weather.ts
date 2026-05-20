@@ -59,6 +59,18 @@ export interface WeatherResponse {
   utc_offset_seconds: number;
 }
 
+export interface WeatherAlert {
+  id: number;
+  headline: string;
+  description: string;
+  instruction?: string | null;
+  event: string;
+  severity: 'minor' | 'moderate' | 'severe' | 'extreme';
+  urgency: string;
+  onset: string;
+  expires: string;
+}
+
 export interface WeatherInfo {
   icon: string;
   description: string;

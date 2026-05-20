@@ -7,8 +7,9 @@ import Dashboard from './pages/Dashboard';
 import ForecastPage from './pages/ForecastPage';
 import RadarScreen from './pages/RadarScreen';
 import SettingsScreen from './pages/SettingsScreen';
-import { fetchWeather, searchCities } from './api/weather';
-import type { WeatherResponse, GeoLocation, TempUnit, WindUnit, Favorite } from './types/weather';
+import { fetchWeather, searchCities, fetchAlerts } from './api/weather';
+import AlertBanner from './components/AlertBanner';
+import type { WeatherResponse, GeoLocation, TempUnit, WindUnit, Favorite, WeatherAlert } from './types/weather';
 import { getWeatherBackground, DEFAULT_THEME } from './lib/weatherTheme';
 import './App.css';
 
@@ -49,6 +50,7 @@ export default function App() {
   const [tempUnit, setTempUnit] = useState<TempUnit>(() => loadPref('tempUnit', 'celsius'));
   const [windUnit, setWindUnit] = useState<WindUnit>(() => loadPref('windUnit', 'kmh'));
   const [favorites, setFavorites] = useState<Favorite[]>(loadFavorites);
+  const [alerts, setAlerts] = useState<WeatherAlert[]>([]);
 
   const loadWeather = useCallback(async (lat: number, lon: number, city: string, countryName: string, tu: TempUnit, wu: WindUnit) => {
     setIsLoading(true);
@@ -72,6 +74,13 @@ export default function App() {
     const loc = last ?? { lat: DEFAULT_LAT, lon: DEFAULT_LON, city: DEFAULT_CITY, country: DEFAULT_COUNTRY };
     loadWeather(loc.lat, loc.lon, loc.city, loc.country, tempUnit, windUnit);
   }, [loadWeather]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch DWD weather alerts via Bright Sky whenever location changes, refresh every 15 min
+  useEffect(() => {
+    fetchAlerts(coords.lat, coords.lon).then(setAlerts);
+    const id = setInterval(() => fetchAlerts(coords.lat, coords.lon).then(setAlerts), 15 * 60 * 1000);
+    return () => clearInterval(id);
+  }, [coords.lat, coords.lon]);
 
   function handleSelect(loc: GeoLocation) {
     loadWeather(loc.latitude, loc.longitude, loc.name, loc.country, tempUnit, windUnit);
@@ -204,6 +213,13 @@ export default function App() {
       {/* Scrollable content — hidden on Radar */}
       {!isRadar && (
         <div style={{ padding: '68px 20px 20px' }}>
+
+          {/* Weather alerts (DWD via Bright Sky) */}
+          {alerts.length > 0 && !isLoading && (
+            <div style={{ marginBottom: 16 }}>
+              <AlertBanner alerts={alerts} isDark={theme.isDark} />
+            </div>
+          )}
 
           {/* Error banner */}
           {error && (
