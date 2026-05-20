@@ -102,7 +102,7 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
 
         {/* Header */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, paddingTop: 8 }}>
-          <span className="material-symbols-outlined mat-fill" style={{ fontSize: 60, color }}>{icon}</span>
+          <span className={`material-symbols-outlined mat-fill${icon === 'sunny' ? ' sun-animate' : ''}`} style={{ fontSize: 60, color }}>{icon}</span>
           <p style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 700, color: '#0b1c30', letterSpacing: '-0.02em', marginTop: 4 }}>{dayLabel}</p>
           <p style={{ fontFamily: 'Inter', fontSize: 14, color: '#717783' }}>{fullDate}</p>
           <p style={{ fontFamily: 'Outfit', fontSize: 18, fontWeight: 500, color: '#0b1c30', marginTop: 4 }}>{info.description}</p>
