@@ -1,5 +1,6 @@
 import { getWeatherInfo } from '../components/WeatherIcon';
 import { getMatIcon } from '../lib/weatherCodes';
+import RadarTile from '../components/RadarTile';
 import type { WeatherResponse, TempUnit, WindUnit } from '../types/weather';
 
 interface DashboardProps {
@@ -9,7 +10,10 @@ interface DashboardProps {
   timezone: string;
   tempUnit: TempUnit;
   windUnit: WindUnit;
+  lat: number;
+  lon: number;
   isDark?: boolean;
+  onNavigateToRadar: () => void;
 }
 
 function getMatIconLocal(code: number) { return getMatIcon(code); }
@@ -77,7 +81,7 @@ function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds, isDark }: { sunriseIs
   );
 }
 
-export default function Dashboard({ weather, cityName, country, timezone, tempUnit, windUnit, isDark = false }: DashboardProps) {
+export default function Dashboard({ weather, cityName, country, timezone, tempUnit, windUnit, lat, lon, isDark = false, onNavigateToRadar }: DashboardProps) {
   const { current, daily, hourly } = weather;
   const info = getWeatherInfo(current.weather_code);
 
@@ -169,7 +173,8 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
               const absIdx = currentHourIndex + idx;
               const temp = Math.round(hourly.temperature_2m[absIdx]);
               const code = hourly.weather_code[absIdx];
-              const precip = hourly.precipitation_probability[absIdx];
+              const precipMm   = hourly.precipitation[absIdx] ?? 0;
+              const precipProb = hourly.precipitation_probability[absIdx] ?? 0;
               const { icon, color } = getMatIconLocal(code);
               const hour = new Date(timeStr + ':00').getHours();
               const label = idx === 0 ? 'Jetzt' : `${String(hour).padStart(2, '0')}:00`;
@@ -178,17 +183,32 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
                   <span style={{ fontFamily: 'Inter', fontSize: 12, color: c.muted }}>{label}</span>
                   <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color }}>{icon}</span>
                   <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
-                  {precip > 0 && (
+                  {precipMm > 0.05 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                      <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>{precipMm.toFixed(1)}mm</span>
+                      {precipProb > 0 && (
+                        <span style={{ fontFamily: 'Inter', fontSize: 10, color: '#3b82f6', fontVariantNumeric: 'tabular-nums', opacity: 0.75 }}>{precipProb}%</span>
+                      )}
+                    </div>
+                  ) : precipProb > 0 ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#3b82f6', flexShrink: 0 }} />
-                      <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>{precip}%</span>
+                      <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>{precipProb}%</span>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               );
             })}
           </div>
         </div>
+      </div>
+
+      {/* Radar tile */}
+      <div>
+        <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: c.muted, marginBottom: 8, paddingLeft: 4 }}>
+          Radar
+        </p>
+        <RadarTile lat={lat} lon={lon} isDark={isDark} onExpand={onNavigateToRadar} />
       </div>
 
       {/* Bento grid */}

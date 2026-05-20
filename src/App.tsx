@@ -245,7 +245,10 @@ export default function App() {
               timezone={weather.timezone}
               tempUnit={tempUnit}
               windUnit={windUnit}
+              lat={coords.lat}
+              lon={coords.lon}
               isDark={theme.isDark}
+              onNavigateToRadar={() => setActiveTab(2)}
             />
           )}
 

@@ -53,22 +53,22 @@ export function getWeatherBackground(
 
   // Rain / showers
   if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) {
-    return { background: 'linear-gradient(175deg, #3e6278 0%, #8aaec4 100%)', isDark: false, isNight: false };
+    return { background: 'linear-gradient(175deg, #3e6278 0%, #8aaec4 100%)', isDark: true, isNight: false };
   }
 
   // Drizzle
   if (code >= 51 && code <= 57) {
-    return { background: 'linear-gradient(175deg, #527890 0%, #a4c0d0 100%)', isDark: false, isNight: false };
+    return { background: 'linear-gradient(175deg, #527890 0%, #a4c0d0 100%)', isDark: true, isNight: false };
   }
 
   // Fog
   if (code === 45 || code === 48) {
-    return { background: 'linear-gradient(175deg, #8298a8 0%, #c8d8e2 100%)', isDark: false, isNight: false };
+    return { background: 'linear-gradient(175deg, #8298a8 0%, #c8d8e2 100%)', isDark: true, isNight: false };
   }
 
   // Overcast
   if (code === 3) {
-    return { background: 'linear-gradient(175deg, #6e8898 0%, #bcccd8 100%)', isDark: false, isNight: false };
+    return { background: 'linear-gradient(175deg, #6e8898 0%, #bcccd8 100%)', isDark: true, isNight: false };
   }
 
   // Partly cloudy
