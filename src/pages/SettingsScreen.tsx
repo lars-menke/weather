@@ -179,7 +179,7 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
                 Kompletter Changelog
               </div>
               <div style={{ fontFamily: 'Inter', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.45)' : '#a0aab4', marginTop: 1 }}>
-                v{CHANGELOG[CHANGELOG.length - 1].version} – v{CHANGELOG[1].version}
+                v{CHANGELOG[CHANGELOG.length - 1].version} – v{CHANGELOG[0].version}
               </div>
             </div>
             <span className="material-symbols-outlined" style={{
@@ -191,7 +191,7 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
 
           {expandedVersion === 'older' && (
             <div style={{ padding: '0 16px 16px' }}>
-              {CHANGELOG.slice(1).map((entry, ei) => (
+              {CHANGELOG.map((entry, ei) => (
                 <div key={entry.version}>
                   <div style={{
                     height: 1,
@@ -201,7 +201,7 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
                   <div style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.4)' : '#a0aab4', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     Version {entry.version} · {entry.date}
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: ei < CHANGELOG.length - 2 ? 16 : 0 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: ei < CHANGELOG.length - 1 ? 16 : 0 }}>
                     {entry.items.map((item, i) => (
                       <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                         <span className="material-symbols-outlined mat-fill" style={{ fontSize: 16, color: isDark ? 'rgba(255,255,255,0.25)' : '#c0c8d0', flexShrink: 0, marginTop: 1 }}>
