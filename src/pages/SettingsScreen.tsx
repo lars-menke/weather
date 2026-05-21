@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import type { TempUnit, WindUnit } from '../types/weather';
+import { CHANGELOG, APP_VERSION } from '../lib/changelog';
 
 interface Props {
   tempUnit: TempUnit;
@@ -84,6 +86,8 @@ function SectionLabel({ children, isDark }: { children: React.ReactNode; isDark?
 }
 
 export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindUnit, isDark = false }: Props) {
+  const [expandedVersion, setExpandedVersion] = useState<string | null>(CHANGELOG[0].version);
+
   const glassCard: React.CSSProperties = {
     background: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.5)',
     borderRadius: 16,
@@ -96,9 +100,14 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 8 }}>
 
-      <p style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30', letterSpacing: '-0.02em' }}>
-        Einstellungen
-      </p>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <p style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30', letterSpacing: '-0.02em' }}>
+          Einstellungen
+        </p>
+        <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.45)' : '#a0aab4', fontVariantNumeric: 'tabular-nums' }}>
+          v{APP_VERSION}
+        </span>
+      </div>
 
       <section>
         <SectionLabel isDark={isDark}>Einheiten</SectionLabel>
@@ -132,6 +141,70 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
           <InfoRow icon="cloud" iconColor="#0060ac" label="Wetterdaten" value="Open-Meteo (open-meteo.com)" isDark={isDark} />
           <InfoRow icon="radar" iconColor="#6366f1" label="Radardaten" value="RainViewer (rainviewer.com)" isDark={isDark} />
           <InfoRow icon="map" iconColor="#10b981" label="Karten" value="OpenStreetMap contributors" divider={false} isDark={isDark} />
+        </div>
+      </section>
+
+      <section>
+        <SectionLabel isDark={isDark}>Was ist neu?</SectionLabel>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {CHANGELOG.map((entry) => {
+            const isOpen = expandedVersion === entry.version;
+            const isLatest = entry.version === CHANGELOG[0].version;
+            return (
+              <div key={entry.version} style={{ ...glassCard, overflow: 'hidden' }}>
+                <button
+                  onClick={() => setExpandedVersion(isOpen ? null : entry.version)}
+                  aria-expanded={isOpen}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <div style={{
+                    minWidth: 36, height: 36, borderRadius: 10,
+                    background: isLatest
+                      ? (isDark ? 'rgba(99,102,241,0.35)' : 'rgba(99,102,241,0.12)')
+                      : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  }}>
+                    <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 700, color: isLatest ? '#6366f1' : (isDark ? 'rgba(255,255,255,0.5)' : '#a0aab4') }}>
+                      v{entry.version}
+                    </span>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 600, color: isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30' }}>
+                      {isLatest ? 'Aktuelle Version' : `Version ${entry.version}`}
+                    </div>
+                    <div style={{ fontFamily: 'Inter', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.5)' : '#a0aab4', marginTop: 1 }}>
+                      {entry.date}
+                    </div>
+                  </div>
+                  <span className="material-symbols-outlined" style={{
+                    fontSize: 18, color: isDark ? 'rgba(255,255,255,0.35)' : '#c0c8d0',
+                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease', flexShrink: 0,
+                  }}>expand_more</span>
+                </button>
+
+                {isOpen && (
+                  <div style={{ padding: '0 16px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', marginBottom: 4 }} />
+                    {entry.items.map((item, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                        <span className="material-symbols-outlined mat-fill" style={{ fontSize: 16, color: '#6366f1', flexShrink: 0, marginTop: 1 }}>
+                          {item.icon}
+                        </span>
+                        <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.75)' : '#3a4452', lineHeight: 1.4 }}>
+                          {item.text}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
