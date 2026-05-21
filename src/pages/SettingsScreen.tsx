@@ -8,9 +8,9 @@ interface Props {
 }
 
 const glassCard: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.5)',
+  background: 'var(--c-card-bg)',
   borderRadius: 16,
-  border: '1px solid rgba(255,255,255,0.6)',
+  border: '1px solid var(--c-card-border)',
   backdropFilter: 'blur(16px)',
   WebkitBackdropFilter: 'blur(16px)',
   overflow: 'hidden',
@@ -21,11 +21,7 @@ const rowDivider: React.CSSProperties = {
 };
 
 function SegmentToggle<T extends string>({
-  options,
-  value,
-  onChange,
-  labels,
-  ariaLabels,
+  options, value, onChange, labels, ariaLabels,
 }: {
   options: T[];
   value: T;
@@ -46,7 +42,7 @@ function SegmentToggle<T extends string>({
             cursor: 'pointer', fontFamily: 'Inter', fontSize: 13,
             fontWeight: value === opt ? 600 : 400,
             background: value === opt ? '#fff' : 'transparent',
-            color: value === opt ? '#0060ac' : '#717783',
+            color: value === opt ? 'var(--c-accent)' : 'var(--c-muted)',
             boxShadow: value === opt ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
             transition: 'background 0.15s, color 0.15s, box-shadow 0.15s',
           }}
@@ -64,7 +60,7 @@ function Row({ icon, iconColor, label, children, divider = true }: {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', ...(divider ? rowDivider : {}) }}>
       <span className="material-symbols-outlined" style={{ fontSize: 20, color: iconColor, flexShrink: 0 }}>{icon}</span>
-      <span style={{ fontFamily: 'Inter', fontSize: 15, color: '#0b1c30', flex: 1 }}>{label}</span>
+      <span style={{ fontFamily: 'Inter', fontSize: 15, color: 'var(--c-primary)', flex: 1 }}>{label}</span>
       {children}
     </div>
   );
@@ -77,8 +73,8 @@ function InfoRow({ icon, iconColor, label, value, divider = true }: {
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', ...(divider ? rowDivider : {}) }}>
       <span className="material-symbols-outlined" style={{ fontSize: 20, color: iconColor, flexShrink: 0 }}>{icon}</span>
       <div style={{ flex: 1 }}>
-        <div style={{ fontFamily: 'Inter', fontSize: 15, color: '#0b1c30' }}>{label}</div>
-        <div style={{ fontFamily: 'Inter', fontSize: 13, color: '#717783', marginTop: 2 }}>{value}</div>
+        <div style={{ fontFamily: 'Inter', fontSize: 15, color: 'var(--c-primary)' }}>{label}</div>
+        <div style={{ fontFamily: 'Inter', fontSize: 13, color: 'var(--c-muted)', marginTop: 2 }}>{value}</div>
       </div>
     </div>
   );
@@ -86,7 +82,7 @@ function InfoRow({ icon, iconColor, label, value, divider = true }: {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#717783', marginBottom: 8, paddingLeft: 4 }}>
+    <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--c-muted)', marginBottom: 8, paddingLeft: 4 }}>
       {children}
     </p>
   );
@@ -96,14 +92,14 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 8 }}>
 
-      <p style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 700, color: '#0b1c30', letterSpacing: '-0.02em' }}>
+      <p style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 700, color: 'var(--c-primary)', letterSpacing: '-0.02em' }}>
         Einstellungen
       </p>
 
       <section>
         <SectionLabel>Einheiten</SectionLabel>
         <div style={glassCard}>
-          <Row icon="device_thermostat" iconColor="#0060ac" label="Temperatur">
+          <Row icon="device_thermostat" iconColor="var(--c-accent)" label="Temperatur">
             <SegmentToggle
               options={['celsius', 'fahrenheit'] as TempUnit[]}
               value={tempUnit}
@@ -112,7 +108,7 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
               ariaLabels={{ celsius: 'Celsius', fahrenheit: 'Fahrenheit' }}
             />
           </Row>
-          <Row icon="air" iconColor="#0060ac" label="Windgeschwindigkeit" divider={false}>
+          <Row icon="air" iconColor="var(--c-accent)" label="Windgeschwindigkeit" divider={false}>
             <SegmentToggle
               options={['kmh', 'mph'] as WindUnit[]}
               value={windUnit}
@@ -127,7 +123,7 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
       <section>
         <SectionLabel>Datenquellen</SectionLabel>
         <div style={glassCard}>
-          <InfoRow icon="cloud" iconColor="#0060ac" label="Wetterdaten" value="Open-Meteo (open-meteo.com)" />
+          <InfoRow icon="cloud" iconColor="var(--c-accent)" label="Wetterdaten" value="Open-Meteo (open-meteo.com)" />
           <InfoRow icon="radar" iconColor="#6366f1" label="Radardaten" value="RainViewer (rainviewer.com)" />
           <InfoRow icon="map" iconColor="#10b981" label="Karten" value="OpenStreetMap contributors" divider={false} />
         </div>

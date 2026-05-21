@@ -185,7 +185,7 @@ export function SearchBar({ onSelect, onGPS, isLoadingGPS, favorites, onSelectFa
               {results.map((loc, idx) => (
                 <button
                   key={loc.id}
-                  onMouseDown={() => handleSelect(loc)}
+                  onPointerDown={() => handleSelect(loc)}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: 12,
                     padding: '14px 16px', textAlign: 'left',

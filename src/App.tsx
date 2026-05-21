@@ -153,7 +153,7 @@ export default function App() {
   const isRadar = activeTab === 2;
 
   return (
-    <div style={{ minHeight: '100dvh', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 60, position: 'relative', background: theme.background, transition: 'background 2s ease' }}>
+    <div data-theme={theme.isDark ? 'dark' : 'light'} style={{ minHeight: '100dvh', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 60, position: 'relative', background: theme.background, transition: 'background 2s ease' }}>
 
       {/* Weather particle animation */}
       {weather && (
@@ -243,7 +243,6 @@ export default function App() {
               timezone={weather.timezone}
               tempUnit={tempUnit}
               windUnit={windUnit}
-              isDark={theme.isDark}
             />
           )}
 
@@ -254,7 +253,6 @@ export default function App() {
               timezone={weather.timezone}
               tempUnit={tempUnit}
               windUnit={windUnit}
-              isDark={theme.isDark}
             />
           )}
 

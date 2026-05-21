@@ -1,9 +1,36 @@
-@import "tailwindcss";
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+/* Design tokens — light (default) and dark (set via data-theme on root) */
+:root {
+  --c-primary: #0b1c30;
+  --c-muted: #717783;
+  --c-accent: #0060ac;
+  --c-card-bg: rgba(255, 255, 255, 0.5);
+  --c-card-border: rgba(255, 255, 255, 0.6);
+  --c-divider: rgba(0, 0, 0, 0.12);
+  --c-bar-track: rgba(0, 0, 0, 0.08);
+  --c-bar-fill: #0060ac;
+  --c-chevron: rgba(0, 96, 172, 0.4);
+  --c-arc-horizon: rgba(0, 0, 0, 0.1);
+  --c-arc-track: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+  --c-primary: rgba(255, 255, 255, 0.95);
+  --c-muted: rgba(255, 255, 255, 0.58);
+  --c-accent: rgba(255, 255, 255, 0.95);
+  --c-card-bg: rgba(255, 255, 255, 0.13);
+  --c-card-border: rgba(255, 255, 255, 0.17);
+  --c-divider: rgba(255, 255, 255, 0.2);
+  --c-bar-track: rgba(255, 255, 255, 0.12);
+  --c-bar-fill: rgba(255, 255, 255, 0.75);
+  --c-chevron: rgba(255, 255, 255, 0.3);
+  --c-arc-horizon: rgba(255, 255, 255, 0.15);
+  --c-arc-track: rgba(255, 255, 255, 0.12);
 }
 
 html {
@@ -19,9 +46,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  /* iOS rubber-band containment */
   overscroll-behavior-y: contain;
-  /* bottom safe area for home indicator */
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -32,8 +57,6 @@ body {
   overflow-x: hidden;
 }
 
-/* The sticky header sits at the very top;
-   safe-area-inset-top is handled via padding so the glass extends behind the status bar */
 .glass-header {
   padding-top: env(safe-area-inset-top);
 }
@@ -84,6 +107,18 @@ body {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin { animation: spin 1s linear infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+.animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 
 button:focus-visible,
 a:focus-visible {
