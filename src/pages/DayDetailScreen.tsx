@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { DailyWeatherData, HourlyWeatherData, TempUnit, WindUnit } from '../types/weather';
 import { getWeatherInfo } from '../components/WeatherIcon';
 import { getMatIcon } from '../lib/weatherCodes';
@@ -41,6 +42,20 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
   const startIdx = dayIndex * 24;
   const hourCount = Math.min(24, hourly.time.length - startIdx);
   const indices = Array.from({ length: hourCount }, (_, h) => startIdx + h);
+
+  // Current-hour index within this day's 24 slots (only relevant for today)
+  const nowRef = useRef<HTMLDivElement>(null);
+  const currentHourInDay = (() => {
+    if (dayIndex !== 0) return -1;
+    const localHour = Number(
+      new Intl.DateTimeFormat('en-US', { timeZone: timezone, hour: 'numeric', hour12: false }).format(new Date())
+    ) % 24;
+    return indices.findIndex(i => Number((hourly.time[i] ?? '').slice(11, 13)) === localHour);
+  })();
+
+  useEffect(() => {
+    nowRef.current?.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }, []);
 
   const dateStr = daily.time[dayIndex] ?? '';
   const dayLabel = dayIndex === 0 ? 'Heute' : dayIndex === 1 ? 'Morgen' : getDayLabel(dateStr, timezone);
@@ -126,9 +141,19 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
                 const precipMm   = hourly.precipitation[idx] ?? 0;
                 const precipProb = hourly.precipitation_probability[idx] ?? 0;
                 const { icon: hIcon, color: hColor } = getMatIcon(hCode);
+                const isNow = h === currentHourInDay;
+                const label = isNow ? 'Jetzt' : (h === 0 ? '00:00' : timeLabel);
                 return (
-                  <div key={idx} style={{ minWidth: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 10px', gap: 4 }}>
-                    <span style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783' }}>{h === 0 ? '00:00' : timeLabel}</span>
+                  <div
+                    key={idx}
+                    ref={isNow ? nowRef : null}
+                    style={{
+                      minWidth: 64, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                      padding: '12px 10px', gap: 4, borderRadius: 10,
+                      background: isNow ? 'rgba(0,96,172,0.09)' : 'transparent',
+                    }}
+                  >
+                    <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: isNow ? 700 : 400, color: isNow ? '#0060ac' : '#717783' }}>{label}</span>
                     <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color: hColor }}>{hIcon}</span>
                     <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
                     {precipMm > 0.05 ? (

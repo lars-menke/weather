@@ -200,10 +200,17 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
               const precipProb = hourly.precipitation_probability[absIdx] ?? 0;
               const { icon, color } = getMatIconLocal(code);
               const hour = new Date(timeStr + ':00').getHours();
-              const label = idx === 0 ? 'Jetzt' : `${String(hour).padStart(2, '0')}:00`;
+              const isNow = idx === 0;
+              const label = isNow ? 'Jetzt' : `${String(hour).padStart(2, '0')}:00`;
               return (
-                <div key={timeStr} style={{ minWidth: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 10px', gap: 4 }}>
-                  <span style={{ fontFamily: 'Inter', fontSize: 12, color: c.muted }}>{label}</span>
+                <div key={timeStr} style={{
+                  minWidth: 64, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  padding: '12px 10px', gap: 4, borderRadius: 10,
+                  background: isNow
+                    ? (isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,96,172,0.09)')
+                    : 'transparent',
+                }}>
+                  <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: isNow ? 700 : 400, color: isNow ? c.accent : c.muted }}>{label}</span>
                   <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color }}>{icon}</span>
                   <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
                   {precipMm > 0.05 ? (
