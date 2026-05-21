@@ -161,56 +161,62 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
         </div>
       </section>
 
-      {/* Ältere Versionen */}
+      {/* Ältere Versionen — ein einziger aufklappbarer Block */}
       <section>
         <SectionLabel isDark={isDark}>Ältere Versionen</SectionLabel>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {CHANGELOG.slice(1).map((entry) => {
-            const isOpen = expandedVersion === entry.version;
-            return (
-              <div key={entry.version} style={{ ...glassCard, overflow: 'hidden' }}>
-                <button
-                  onClick={() => setExpandedVersion(isOpen ? null : entry.version)}
-                  aria-expanded={isOpen}
-                  style={{
-                    width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 600, color: isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30' }}>
-                      Version {entry.version}
-                    </div>
-                    <div style={{ fontFamily: 'Inter', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.45)' : '#a0aab4', marginTop: 1 }}>
-                      {entry.date}
-                    </div>
-                  </div>
-                  <span className="material-symbols-outlined" style={{
-                    fontSize: 18, color: isDark ? 'rgba(255,255,255,0.3)' : '#c0c8d0',
-                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.2s ease', flexShrink: 0,
-                  }}>expand_more</span>
-                </button>
+        <div style={{ ...glassCard, overflow: 'hidden' }}>
+          <button
+            onClick={() => setExpandedVersion(expandedVersion === 'older' ? null : 'older')}
+            aria-expanded={expandedVersion === 'older'}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+              padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer',
+              textAlign: 'left',
+            }}
+          >
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 600, color: isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30' }}>
+                Kompletter Changelog
+              </div>
+              <div style={{ fontFamily: 'Inter', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.45)' : '#a0aab4', marginTop: 1 }}>
+                v{CHANGELOG[CHANGELOG.length - 1].version} – v{CHANGELOG[1].version}
+              </div>
+            </div>
+            <span className="material-symbols-outlined" style={{
+              fontSize: 18, color: isDark ? 'rgba(255,255,255,0.3)' : '#c0c8d0',
+              transform: expandedVersion === 'older' ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.2s ease', flexShrink: 0,
+            }}>expand_more</span>
+          </button>
 
-                {isOpen && (
-                  <div style={{ padding: '0 16px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', marginBottom: 4 }} />
+          {expandedVersion === 'older' && (
+            <div style={{ padding: '0 16px 16px' }}>
+              {CHANGELOG.slice(1).map((entry, ei) => (
+                <div key={entry.version}>
+                  <div style={{
+                    height: 1,
+                    background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                    marginBottom: 12,
+                  }} />
+                  <div style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.4)' : '#a0aab4', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    Version {entry.version} · {entry.date}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: ei < CHANGELOG.length - 2 ? 16 : 0 }}>
                     {entry.items.map((item, i) => (
                       <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                        <span className="material-symbols-outlined mat-fill" style={{ fontSize: 16, color: isDark ? 'rgba(255,255,255,0.3)' : '#c0c8d0', flexShrink: 0, marginTop: 1 }}>
+                        <span className="material-symbols-outlined mat-fill" style={{ fontSize: 16, color: isDark ? 'rgba(255,255,255,0.25)' : '#c0c8d0', flexShrink: 0, marginTop: 1 }}>
                           {item.icon}
                         </span>
-                        <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.6)' : '#717783', lineHeight: 1.4 }}>
+                        <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.55)' : '#717783', lineHeight: 1.4 }}>
                           {item.text}
                         </span>
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
