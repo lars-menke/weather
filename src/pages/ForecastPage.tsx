@@ -11,6 +11,8 @@ interface ForecastPageProps {
   tempUnit: TempUnit;
   windUnit: WindUnit;
   isDark?: boolean;
+  cityName: string;
+  country: string;
 }
 
 const DAYS_DE: Record<string, string> = {
@@ -26,7 +28,7 @@ function getDayLabel(dateStr: string, index: number, timezone: string): string {
   return DAYS_DE[eng] ?? eng;
 }
 
-export default function ForecastPage({ data, hourly, timezone, tempUnit, windUnit, isDark = false }: ForecastPageProps) {
+export default function ForecastPage({ data, hourly, timezone, tempUnit, windUnit, isDark = false, cityName, country }: ForecastPageProps) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   const globalMax = Math.max(...data.temperature_2m_max);
@@ -55,10 +57,13 @@ export default function ForecastPage({ data, hourly, timezone, tempUnit, windUni
   return (
     <>
       <div className="animate-fade-in">
-        <p style={{ fontFamily: 'Outfit', fontSize: 20, fontWeight: 500, color: titleColor, padding: '0 0 12px 0' }}>
+        <p style={{ fontFamily: 'Outfit', fontSize: 20, fontWeight: 500, color: titleColor, padding: '0 0 4px 0' }}>
           7-Tage-Vorhersage
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 13, color: mutedColor, marginBottom: 16 }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: mutedColor, marginBottom: 4 }}>
+          {cityName}{country ? `, ${country}` : ''}
+        </p>
+        <p style={{ fontFamily: 'Inter', fontSize: 13, color: mutedColor, marginBottom: 16, opacity: 0.7 }}>
           Tippen für Details
         </p>
 

@@ -269,6 +269,8 @@ export default function App() {
               tempUnit={tempUnit}
               windUnit={windUnit}
               isDark={theme.isDark}
+              cityName={cityName}
+              country={country}
             />
           )}
 

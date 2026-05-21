@@ -233,14 +233,6 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
         </div>
       </div>
 
-      {/* Radar tile */}
-      <div>
-        <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: c.muted, marginBottom: 8, paddingLeft: 4 }}>
-          Radar
-        </p>
-        <RadarTile lat={lat} lon={lon} isDark={isDark} onExpand={onNavigateToRadar} />
-      </div>
-
       {/* Bento grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
 
@@ -278,6 +270,14 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
           </div>
         )}
 
+      </div>
+
+      {/* Radar tile — ganz unten */}
+      <div>
+        <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: c.muted, marginBottom: 8, paddingLeft: 4 }}>
+          Radar
+        </p>
+        <RadarTile lat={lat} lon={lon} isDark={isDark} onExpand={onNavigateToRadar} />
       </div>
     </div>
   );
