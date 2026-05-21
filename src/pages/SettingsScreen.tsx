@@ -144,12 +144,29 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
         </div>
       </section>
 
+      {/* Aktuelle Version */}
       <section>
-        <SectionLabel isDark={isDark}>Was ist neu?</SectionLabel>
+        <SectionLabel isDark={isDark}>Was ist neu? · v{APP_VERSION}</SectionLabel>
+        <div style={{ ...glassCard, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {CHANGELOG[0].items.map((item, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+              <span className="material-symbols-outlined mat-fill" style={{ fontSize: 16, color: '#6366f1', flexShrink: 0, marginTop: 1 }}>
+                {item.icon}
+              </span>
+              <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.8)' : '#3a4452', lineHeight: 1.4 }}>
+                {item.text}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Ältere Versionen */}
+      <section>
+        <SectionLabel isDark={isDark}>Ältere Versionen</SectionLabel>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {CHANGELOG.map((entry) => {
+          {CHANGELOG.slice(1).map((entry) => {
             const isOpen = expandedVersion === entry.version;
-            const isLatest = entry.version === CHANGELOG[0].version;
             return (
               <div key={entry.version} style={{ ...glassCard, overflow: 'hidden' }}>
                 <button
@@ -161,27 +178,16 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
                     textAlign: 'left',
                   }}
                 >
-                  <div style={{
-                    minWidth: 36, height: 36, borderRadius: 10,
-                    background: isLatest
-                      ? (isDark ? 'rgba(99,102,241,0.35)' : 'rgba(99,102,241,0.12)')
-                      : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  }}>
-                    <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 700, color: isLatest ? '#6366f1' : (isDark ? 'rgba(255,255,255,0.5)' : '#a0aab4') }}>
-                      v{entry.version}
-                    </span>
-                  </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 600, color: isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30' }}>
-                      {isLatest ? 'Aktuelle Version' : `Version ${entry.version}`}
+                      Version {entry.version}
                     </div>
-                    <div style={{ fontFamily: 'Inter', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.5)' : '#a0aab4', marginTop: 1 }}>
+                    <div style={{ fontFamily: 'Inter', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.45)' : '#a0aab4', marginTop: 1 }}>
                       {entry.date}
                     </div>
                   </div>
                   <span className="material-symbols-outlined" style={{
-                    fontSize: 18, color: isDark ? 'rgba(255,255,255,0.35)' : '#c0c8d0',
+                    fontSize: 18, color: isDark ? 'rgba(255,255,255,0.3)' : '#c0c8d0',
                     transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                     transition: 'transform 0.2s ease', flexShrink: 0,
                   }}>expand_more</span>
@@ -192,10 +198,10 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
                     <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', marginBottom: 4 }} />
                     {entry.items.map((item, i) => (
                       <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                        <span className="material-symbols-outlined mat-fill" style={{ fontSize: 16, color: '#6366f1', flexShrink: 0, marginTop: 1 }}>
+                        <span className="material-symbols-outlined mat-fill" style={{ fontSize: 16, color: isDark ? 'rgba(255,255,255,0.3)' : '#c0c8d0', flexShrink: 0, marginTop: 1 }}>
                           {item.icon}
                         </span>
-                        <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.75)' : '#3a4452', lineHeight: 1.4 }}>
+                        <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.6)' : '#717783', lineHeight: 1.4 }}>
                           {item.text}
                         </span>
                       </div>
