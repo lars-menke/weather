@@ -61,18 +61,21 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         ref={containerRef}
         style={{ position: 'relative', width: 96, height: 96 }}
       >
-        {/* Ghost sun — hand-drawn outline */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          pointerEvents: 'none',
-        }}>
-          <svg
-            viewBox="0 0 100 100"
-            fill="none"
-            style={{ width: 170, height: 170, opacity: 0.22, animation: 'sun-pulse 4s ease-in-out infinite' }}
-            aria-hidden="true"
-          >
+        {/* Ghost sun — hand-drawn outline, upper-right of frog */}
+        <svg
+          viewBox="0 0 100 100"
+          fill="none"
+          style={{
+            position: 'absolute',
+            top: -58,
+            left: 10,
+            width: 170, height: 170,
+            opacity: 0.22,
+            animation: 'sun-pulse 4s ease-in-out infinite',
+            pointerEvents: 'none',
+          }}
+          aria-hidden="true"
+        >
             {/* Slightly imperfect circle */}
             <path
               d="M 50 27 C 64 25, 75 36, 74 50 C 73 64, 62 75, 50 74 C 37 74, 25 63, 26 50 C 26 37, 36 25, 50 27 Z"
@@ -87,8 +90,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
             <path d="M 33 67 Q 27 73 22 78"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
             <path d="M 21 50 Q 15 49 9 51"    stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
             <path d="M 33 33 Q 27 27 22 22"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
-          </svg>
-        </div>
+        </svg>
 
         {/* Frog */}
         <img
