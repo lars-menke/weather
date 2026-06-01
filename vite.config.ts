@@ -12,9 +12,9 @@ export default defineConfig({
       base: '/weather/',
       includeAssets: ['apple-touch-icon.png', 'favicon-32.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
-        name: 'Wetter',
-        short_name: 'Wetter',
-        description: 'Moderne Wetter-App powered by Open-Meteo',
+        name: 'FrogWeather',
+        short_name: 'FrogWeather',
+        description: 'FrogWeather – Der Wetterfrosch fürs iPhone',
         start_url: '/weather/',
         scope: '/weather/',
         display: 'standalone',

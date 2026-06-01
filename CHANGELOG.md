@@ -4,6 +4,17 @@ Alle relevanten Änderungen an der App, gegliedert nach Version.
 
 ---
 
+## v1.7 — 1. Juni 2026
+
+- App umbenannt in **FrogWeather** – Der Wetterfrosch fürs iPhone (Titel, PWA-Manifest, Splash)
+- Frosch und Sonne gemeinsam im Splash Screen
+- Sonnenkachel zeigt Goldene Stunde (Morgen/Abend) und aktuellen UV-Index
+- Frosch-Kachel und Wettersymbol starten mit Einflug-Animation
+- DWD-Warnungen vollständig auf- und zuklappbar (ab 120 Zeichen)
+- Reihenfolge im Bento-Grid: Frosch zuerst, Sonne danach
+
+---
+
 ## v1.6 — 1. Juni 2026
 
 - Wetterfrosch: vier eigene Illustrationen (Sonnenbrille / freundlich / bewölkt / Regen) zeigen die aktuelle Wetterlage auf einer Holzleiter

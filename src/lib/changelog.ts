@@ -6,6 +6,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.7',
+    date: '1. Juni 2026',
+    items: [
+      { icon: 'badge',        text: 'App heißt jetzt FrogWeather – Der Wetterfrosch fürs iPhone' },
+      { icon: 'cruelty_free', text: 'Frosch und Sonne gemeinsam im Splash Screen' },
+      { icon: 'wb_twilight',  text: 'Sonnenkachel zeigt Goldene Stunde und UV-Index' },
+      { icon: 'animation',    text: 'Frosch und Wettersymbol mit Einflug-Animation' },
+      { icon: 'expand_more',  text: 'DWD-Warnungen vollständig auf- und zuklappbar' },
+    ],
+  },
+  {
     version: '1.6',
     date: '1. Juni 2026',
     items: [
