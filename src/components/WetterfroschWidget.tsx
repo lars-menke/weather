@@ -8,7 +8,6 @@ interface WetterfroschWidgetProps {
   isDark?: boolean;
 }
 
-// WMO code → rung (4 = top/sunny, 1 = bottom/rain)
 function getRung(code: number): 1 | 2 | 3 | 4 {
   if (code === 0) return 4;
   if (code <= 2) return 3;
@@ -23,138 +22,95 @@ const FROGS: Record<number, string> = {
   1: frosch4,
 };
 
-const RUNG_INFOS: Array<{ rung: 1|2|3|4; label: string; icon: string; centerY: number }> = [
-  { rung: 4, label: 'Sonnenschein', icon: 'wb_sunny',          centerY: 83  },
-  { rung: 3, label: 'Heiter',       icon: 'partly_cloudy_day', centerY: 125 },
-  { rung: 2, label: 'Bewölkt',      icon: 'cloud',             centerY: 167 },
-  { rung: 1, label: 'Regen',        icon: 'rainy',             centerY: 209 },
-];
-
-// SVG viewBox "0 0 140 250" — rung tops: 78, 120, 162, 204 (h=11 each)
-// Frog top = rung_top − 71 → frog bottom at rung_top + 5 (sits on rung)
-const FROG_TOP: Record<number, number> = { 4: 7, 3: 49, 2: 91, 1: 133 };
+// SVG viewBox "0 0 100 190"
+// Rails: x=30,60  y=42  h=140  w=10
+// Rung tops: 50, 84, 118, 152  h=8
+// Ground ellipse: cy=173
+// Frog 52px: top = rung_top - 46  (frog bottom = rung_top + 6)
+const FROG_TOP: Record<number, number> = { 4: 4, 3: 38, 2: 72, 1: 106 };
 
 export default function WetterfroschWidget({ code, isDark = false }: WetterfroschWidgetProps) {
   const rung = getRung(code);
-  const mutedColor  = isDark ? 'rgba(255,255,255,0.55)' : '#717783';
-  const accentColor = isDark ? 'rgba(255,255,255,0.95)' : '#0060ac';
 
   return (
-    <div>
-      <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
-                  letterSpacing: '0.1em', color: mutedColor, marginBottom: 8, paddingLeft: 4 }}>
-        Wetterfrosch
-      </p>
+    <div style={{
+      // Glass-jar look: blue-tinted, thicker border, cylindrical feel
+      background:   isDark ? 'rgba(150, 195, 255, 0.10)' : 'rgba(185, 225, 255, 0.32)',
+      border:       isDark ? '2px solid rgba(160, 200, 255, 0.22)' : '2px solid rgba(165, 210, 255, 0.60)',
+      borderRadius: '12px 12px 18px 18px',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      position: 'relative',
+      overflow: 'hidden',
+      display: 'flex',
+      justifyContent: 'center',
+      padding: '14px 0 10px',
+    }}>
 
+      {/* Left-side glass reflection */}
       <div style={{
-        background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.5)',
-        borderRadius: 16,
-        border: isDark ? '1px solid rgba(255,255,255,0.16)' : '1px solid rgba(255,255,255,0.6)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        padding: 16,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 20,
-      }}>
+        position: 'absolute',
+        left: 9, top: 16, bottom: 16, width: 3,
+        borderRadius: 2,
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.04) 100%)',
+        pointerEvents: 'none',
+      }} />
 
-        {/* Ladder + frog */}
-        <div style={{ position: 'relative', width: 140, height: 250, flexShrink: 0 }}>
-          <svg viewBox="0 0 140 250" width="140" height="250" aria-hidden="true">
-            <defs>
-              <linearGradient id="wfr-rail" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%"   stopColor="#7a4e1e"/>
-                <stop offset="25%"  stopColor="#c8813a"/>
-                <stop offset="60%"  stopColor="#e09a48"/>
-                <stop offset="100%" stopColor="#8b5a22"/>
-              </linearGradient>
-              <linearGradient id="wfr-rung" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#e09a48"/>
-                <stop offset="50%"  stopColor="#c8813a"/>
-                <stop offset="100%" stopColor="#8b5a22"/>
-              </linearGradient>
-            </defs>
+      {/* Ladder + frog */}
+      <div style={{ position: 'relative', width: 100, height: 190 }}>
+        <svg viewBox="0 0 100 190" width="100" height="190" aria-hidden="true">
+          <defs>
+            <linearGradient id="wfr-rail" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stopColor="#7a4e1e"/>
+              <stop offset="25%"  stopColor="#c8813a"/>
+              <stop offset="60%"  stopColor="#e09a48"/>
+              <stop offset="100%" stopColor="#8b5a22"/>
+            </linearGradient>
+            <linearGradient id="wfr-rung" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="#e09a48"/>
+              <stop offset="50%"  stopColor="#c8813a"/>
+              <stop offset="100%" stopColor="#8b5a22"/>
+            </linearGradient>
+          </defs>
 
-            {/* Rail drop shadows */}
-            <rect x="43" y="70" width="12" height="152" rx="6" fill="rgba(0,0,0,0.18)"/>
-            <rect x="87" y="70" width="12" height="152" rx="6" fill="rgba(0,0,0,0.18)"/>
-            {/* Rails */}
-            <rect x="40" y="68" width="12" height="152" rx="6" fill="url(#wfr-rail)"/>
-            <rect x="88" y="68" width="12" height="152" rx="6" fill="url(#wfr-rail)"/>
+          {/* Ground the ladder stands on */}
+          <ellipse cx="50" cy="176" rx="30" ry="6"   fill="rgba(90,62,28,0.40)"/>
+          <ellipse cx="50" cy="173" rx="26" ry="3.5" fill="rgba(130,95,45,0.35)"/>
 
-            {/* Rungs */}
-            {([78, 120, 162, 204] as const).map((y, i) => {
-              const r = (4 - i) as 1|2|3|4;
-              const active = r === rung;
-              return (
-                <g key={r}>
-                  <rect x="41" y={y + 2} width="58" height="11" rx="5.5" fill="rgba(0,0,0,0.2)"/>
-                  <rect x="40" y={y}     width="60" height="11" rx="5.5"
-                        fill={active ? '#f0b870' : 'url(#wfr-rung)'}/>
-                  {active && (
-                    <rect x="40" y={y} width="60" height="11" rx="5.5"
-                          fill="none" stroke="rgba(255,200,80,0.7)" strokeWidth="1.5"/>
-                  )}
-                </g>
-              );
-            })}
-          </svg>
+          {/* Rail drop shadows */}
+          <rect x="33" y="44" width="10" height="132" rx="5" fill="rgba(0,0,0,0.18)"/>
+          <rect x="57" y="44" width="10" height="132" rx="5" fill="rgba(0,0,0,0.18)"/>
+          {/* Rails */}
+          <rect x="30" y="42" width="10" height="132" rx="5" fill="url(#wfr-rail)"/>
+          <rect x="60" y="42" width="10" height="132" rx="5" fill="url(#wfr-rail)"/>
 
-          {/* Frog — animates vertically when rung changes */}
-          <img
-            src={FROGS[rung]}
-            alt=""
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              top: FROG_TOP[rung],
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: 76,
-              height: 76,
-              objectFit: 'contain',
-              transition: 'top 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              pointerEvents: 'none',
-              userSelect: 'none',
-            }}
-          />
-        </div>
+          {/* Rungs — no active highlight */}
+          {([50, 84, 118, 152] as const).map((y) => (
+            <g key={y}>
+              <rect x="31" y={y + 2} width="38" height="8" rx="4" fill="rgba(0,0,0,0.20)"/>
+              <rect x="30" y={y}     width="40" height="8" rx="4" fill="url(#wfr-rung)"/>
+            </g>
+          ))}
+        </svg>
 
-        {/* Rung labels aligned to SVG rung positions */}
-        <div style={{ position: 'relative', flex: 1, height: 250 }}>
-          {RUNG_INFOS.map(({ rung: r, label, icon, centerY }) => {
-            const isActive = r === rung;
-            return (
-              <div key={r} style={{
-                position: 'absolute',
-                top: centerY - 12,
-                left: 0,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                opacity: isActive ? 1 : 0.3,
-                transition: 'opacity 0.4s',
-              }}>
-                <span
-                  className={`material-symbols-outlined${isActive ? ' mat-fill' : ''}`}
-                  style={{ fontSize: 20, color: isActive ? accentColor : mutedColor }}
-                >
-                  {icon}
-                </span>
-                <span style={{
-                  fontFamily: 'Inter',
-                  fontSize: isActive ? 15 : 13,
-                  fontWeight: isActive ? 700 : 400,
-                  color: isActive ? accentColor : mutedColor,
-                  transition: 'font-size 0.4s, font-weight 0.4s',
-                }}>
-                  {label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
+        {/* Frog — animates vertically on weather change */}
+        <img
+          src={FROGS[rung]}
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: FROG_TOP[rung],
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 52,
+            height: 52,
+            objectFit: 'contain',
+            transition: 'top 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            pointerEvents: 'none',
+            userSelect: 'none',
+          }}
+        />
       </div>
     </div>
   );

@@ -43,13 +43,6 @@ function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds, isDark }: { sunriseIs
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-        <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#f59e0b' }}>wb_sunny</span>
-        <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: isDark ? 'rgba(255,255,255,0.6)' : '#717783' }}>
-          Sonne
-        </span>
-      </div>
-
       <svg viewBox="0 0 200 110" style={{ width: '100%', height: 'auto', overflow: 'visible' }} aria-hidden="true">
         {/* Horizon line */}
         <line x1="10" y1="100" x2="190" y2="100" stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'} strokeWidth="1" />
@@ -259,9 +252,9 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
           <p style={{ fontFamily: 'Inter', fontSize: 12, color: c.muted, marginTop: 4 }}>Heute gesamt</p>
         </div>
 
-        {/* Sunrise/sunset card — full width */}
+        {/* Sunrise/sunset + Wetterfrosch side by side */}
         {daily.sunrise?.[0] && daily.sunset?.[0] && (
-          <div style={{ ...glassCard, padding: 16, gridColumn: '1 / -1' }}>
+          <div style={{ ...glassCard, padding: 16 }}>
             <SunArc
               sunriseIso={daily.sunrise[0]}
               sunsetIso={daily.sunset[0]}
@@ -270,11 +263,9 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
             />
           </div>
         )}
+        <WetterfroschWidget code={current.weather_code} isDark={isDark} />
 
       </div>
-
-      {/* Wetterfrosch */}
-      <WetterfroschWidget code={current.weather_code} isDark={isDark} />
 
       {/* Radar tile — ganz unten */}
       <div>
