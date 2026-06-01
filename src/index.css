@@ -141,6 +141,16 @@ a:focus-visible {
 }
 .animate-frog-in { animation: frog-hop-in 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both; }
 
+@keyframes frog-tap-hop {
+  0%   { transform: scale(1) translateY(0); }
+  20%  { transform: scale(0.88) translateY(5px); }
+  55%  { transform: scale(1.15) translateY(-18px); }
+  78%  { transform: scale(0.97) translateY(3px); }
+  90%  { transform: scale(1.04) translateY(-2px); }
+  100% { transform: scale(1) translateY(0); }
+}
+.frog-tap-hop { animation: frog-tap-hop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

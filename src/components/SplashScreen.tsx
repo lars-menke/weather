@@ -5,7 +5,6 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
   const onDoneRef    = useRef(onDone);
   const [fading, setFading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const sunRef       = useRef<HTMLSpanElement>(null);
   const titleRef     = useRef<HTMLParagraphElement>(null);
   const subRef       = useRef<HTMLParagraphElement>(null);
 
@@ -41,11 +40,10 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
       transitionIn(subRef.current,       'opacity 0.4s ease 0.4s,  transform 0.4s ease 0.4s',  'translateY(0)');
     }, 80);
 
-    const t2 = setTimeout(() => sunRef.current?.classList.add('sun-animate'), 900);
     const t3 = setTimeout(() => setFading(true), 2000);
     const t4 = setTimeout(() => onDoneRef.current(), 2400);
 
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    return () => { clearTimeout(t1); clearTimeout(t3); clearTimeout(t4); };
   }, []);
 
   return (
@@ -58,21 +56,40 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         gap: 16,
       }}
     >
+      {/* Frog in front, sun ghostly behind */}
       <div
         ref={containerRef}
-        style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+        style={{ position: 'relative', width: 96, height: 96 }}
       >
+        {/* Ghost sun */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          pointerEvents: 'none',
+        }}>
+          <span
+            className="material-symbols-outlined mat-fill"
+            style={{
+              fontSize: 170,
+              color: '#f59e0b',
+              opacity: 0.18,
+              lineHeight: 1,
+              animation: 'sun-pulse 4s ease-in-out infinite',
+            }}
+          >wb_sunny</span>
+        </div>
+
+        {/* Frog */}
         <img
           src={froschSun}
           alt=""
           aria-hidden="true"
-          style={{ width: 76, height: 76, objectFit: 'contain', userSelect: 'none' }}
+          style={{
+            position: 'relative', zIndex: 1,
+            width: 96, height: 96,
+            objectFit: 'contain', userSelect: 'none',
+          }}
         />
-        <span
-          ref={sunRef}
-          className="material-symbols-outlined mat-fill"
-          style={{ fontSize: 76, color: '#f59e0b', lineHeight: 1, userSelect: 'none' }}
-        >wb_sunny</span>
       </div>
 
       <p

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import frosch1 from '../assets/frog/frosch_01_sonnebrille.png';
 import frosch2 from '../assets/frog/frosch_02_freundlich.png';
 import frosch3 from '../assets/frog/frosch_03_bewoelkt.png';
@@ -23,30 +24,38 @@ const FROGS: Record<number, string> = {
 };
 
 // SVG viewBox "0 0 100 190"
-// Rails: x=30,60  y=42  h=140  w=10
 // Rung tops: 50, 84, 118, 152  h=8
-// Ground ellipse: cy=173
-// Frog 52px: top = rung_top - 46  (frog bottom = rung_top + 6)
+// Frog 52px: top = rung_top - 46
 const FROG_TOP: Record<number, number> = { 4: 4, 3: 38, 2: 72, 1: 106 };
 
 export default function WetterfroschWidget({ code, isDark = false }: WetterfroschWidgetProps) {
   const rung = getRung(code);
+  const [tapping, setTapping] = useState(false);
+
+  function handleTap() {
+    if (tapping) return;
+    setTapping(true);
+    setTimeout(() => setTapping(false), 700);
+  }
 
   return (
-    <div style={{
-      // Glass-jar look: blue-tinted, thicker border, cylindrical feel
-      background:   isDark ? 'rgba(150, 195, 255, 0.10)' : 'rgba(185, 225, 255, 0.32)',
-      border:       isDark ? '2px solid rgba(160, 200, 255, 0.22)' : '2px solid rgba(165, 210, 255, 0.60)',
-      borderRadius: '12px 12px 18px 18px',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      position: 'relative',
-      overflow: 'hidden',
-      display: 'flex',
-      justifyContent: 'center',
-      padding: '14px 0 10px',
-    }}>
-
+    <div
+      onClick={handleTap}
+      style={{
+        background:   isDark ? 'rgba(150, 195, 255, 0.10)' : 'rgba(185, 225, 255, 0.32)',
+        border:       isDark ? '2px solid rgba(160, 200, 255, 0.22)' : '2px solid rgba(165, 210, 255, 0.60)',
+        borderRadius: '12px 12px 18px 18px',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '14px 0 10px',
+        cursor: 'pointer',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
       {/* Left-side glass reflection */}
       <div style={{
         position: 'absolute',
@@ -73,18 +82,14 @@ export default function WetterfroschWidget({ code, isDark = false }: Wetterfrosc
             </linearGradient>
           </defs>
 
-          {/* Ground the ladder stands on */}
           <ellipse cx="50" cy="176" rx="30" ry="6"   fill="rgba(90,62,28,0.40)"/>
           <ellipse cx="50" cy="173" rx="26" ry="3.5" fill="rgba(130,95,45,0.35)"/>
 
-          {/* Rail drop shadows */}
           <rect x="33" y="44" width="10" height="132" rx="5" fill="rgba(0,0,0,0.18)"/>
           <rect x="57" y="44" width="10" height="132" rx="5" fill="rgba(0,0,0,0.18)"/>
-          {/* Rails */}
           <rect x="30" y="42" width="10" height="132" rx="5" fill="url(#wfr-rail)"/>
           <rect x="60" y="42" width="10" height="132" rx="5" fill="url(#wfr-rail)"/>
 
-          {/* Rungs — no active highlight */}
           {([50, 84, 118, 152] as const).map((y) => (
             <g key={y}>
               <rect x="31" y={y + 2} width="38" height="8" rx="4" fill="rgba(0,0,0,0.20)"/>
@@ -93,24 +98,25 @@ export default function WetterfroschWidget({ code, isDark = false }: Wetterfrosc
           ))}
         </svg>
 
-        {/* Frog — animates vertically on weather change */}
-        <img
-          src={FROGS[rung]}
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            top: FROG_TOP[rung],
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 52,
-            height: 52,
-            objectFit: 'contain',
-            transition: 'top 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            pointerEvents: 'none',
-            userSelect: 'none',
-          }}
-        />
+        {/* Positioning wrapper — handles vertical weather transition */}
+        <div style={{
+          position: 'absolute',
+          top: FROG_TOP[rung],
+          left: '50%',
+          transform: 'translateX(-50%)',
+          transition: 'top 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          width: 52, height: 52,
+        }}>
+          {/* Animation wrapper — handles tap hop */}
+          <div className={tapping ? 'frog-tap-hop' : ''}>
+            <img
+              src={FROGS[rung]}
+              alt=""
+              aria-hidden="true"
+              style={{ width: 52, height: 52, objectFit: 'contain', display: 'block', userSelect: 'none' }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

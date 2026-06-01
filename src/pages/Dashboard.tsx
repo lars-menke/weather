@@ -57,7 +57,7 @@ function SunArc({
   const primaryColor = isDark ? 'rgba(255,255,255,0.9)' : '#0b1c30';
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       {/* Sunrise / Sunset header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
         <div>
@@ -78,7 +78,8 @@ function SunArc({
         </div>
       </div>
 
-      {/* Arc SVG (labels removed — shown in header above) */}
+      {/* Arc SVG — fills available space */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 60 }}>
       <svg viewBox="0 0 200 108" style={{ width: '100%', height: 'auto', overflow: 'visible' }} aria-hidden="true">
         <line x1="10" y1="100" x2="190" y2="100" stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'} strokeWidth="1" />
         <path d="M 10,100 A 90,90 0 0 1 190,100" fill="none" stroke={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'} strokeWidth="2" strokeLinecap="round" />
@@ -94,6 +95,7 @@ function SunArc({
         )}
         <circle cx={sunX} cy={sunY} r="8" fill={isAboveHorizon ? '#f59e0b' : 'rgba(245,158,11,0.3)'} />
       </svg>
+      </div>
 
       {/* Footer: daylight + UV */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
@@ -296,7 +298,7 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
 
         {/* Sonne danach */}
         {daily.sunrise?.[0] && daily.sunset?.[0] && (
-          <div style={{ ...glassCard, padding: 16 }}>
+          <div style={{ ...glassCard, padding: 16, display: 'flex', flexDirection: 'column' }}>
             <SunArc
               sunriseIso={daily.sunrise[0]}
               sunsetIso={daily.sunset[0]}
