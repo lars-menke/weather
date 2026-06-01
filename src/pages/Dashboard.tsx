@@ -25,7 +25,16 @@ function formatLocalTime(isoLocal: string): string {
   return isoLocal.slice(11, 16);
 }
 
-function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds, isDark }: { sunriseIso: string; sunsetIso: string; utcOffsetSeconds: number; isDark: boolean }) {
+function utcMsToLocalHHMM(utcMs: number, utcOffsetSeconds: number): string {
+  const d = new Date(utcMs + utcOffsetSeconds * 1000);
+  return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+}
+
+function SunArc({
+  sunriseIso, sunsetIso, utcOffsetSeconds, isDark, uvIndex = 0,
+}: {
+  sunriseIso: string; sunsetIso: string; utcOffsetSeconds: number; isDark: boolean; uvIndex?: number;
+}) {
   const toUtcMs = (iso: string) => new Date(iso + 'Z').getTime() - utcOffsetSeconds * 1000;
   const sunriseMs = toUtcMs(sunriseIso);
   const sunsetMs  = toUtcMs(sunsetIso);
@@ -41,14 +50,38 @@ function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds, isDark }: { sunriseIs
   const sunY = 100 - 90 * Math.sin(angle);
   const isAboveHorizon = nowMs >= sunriseMs && nowMs <= sunsetMs;
 
+  const goldenMornEnd   = utcMsToLocalHHMM(sunriseMs + 3600000,  utcOffsetSeconds);
+  const goldenEvenStart = utcMsToLocalHHMM(sunsetMs  - 3600000,  utcOffsetSeconds);
+
+  const labelColor = isDark ? 'rgba(255,255,255,0.6)' : '#717783';
+  const primaryColor = isDark ? 'rgba(255,255,255,0.9)' : '#0b1c30';
+
   return (
     <div>
-      <svg viewBox="0 0 200 110" style={{ width: '100%', height: 'auto', overflow: 'visible' }} aria-hidden="true">
-        {/* Horizon line */}
+      {/* Sunrise / Sunset header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+        <div>
+          <p style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 600, color: primaryColor, fontVariantNumeric: 'tabular-nums' }}>
+            {formatLocalTime(sunriseIso)}
+          </p>
+          <p style={{ fontFamily: 'Inter', fontSize: 10, color: '#f59e0b', marginTop: 1 }}>
+            Goldene Std. bis {goldenMornEnd}
+          </p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <p style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 600, color: primaryColor, fontVariantNumeric: 'tabular-nums' }}>
+            {formatLocalTime(sunsetIso)}
+          </p>
+          <p style={{ fontFamily: 'Inter', fontSize: 10, color: '#f97316', marginTop: 1 }}>
+            Ab {goldenEvenStart}
+          </p>
+        </div>
+      </div>
+
+      {/* Arc SVG (labels removed — shown in header above) */}
+      <svg viewBox="0 0 200 108" style={{ width: '100%', height: 'auto', overflow: 'visible' }} aria-hidden="true">
         <line x1="10" y1="100" x2="190" y2="100" stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'} strokeWidth="1" />
-        {/* Arc track */}
         <path d="M 10,100 A 90,90 0 0 1 190,100" fill="none" stroke={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'} strokeWidth="2" strokeLinecap="round" />
-        {/* Progress arc */}
         {isAboveHorizon && (
           <path
             d={`M 10,100 A 90,90 0 0 1 ${sunX},${sunY}`}
@@ -59,20 +92,23 @@ function SunArc({ sunriseIso, sunsetIso, utcOffsetSeconds, isDark }: { sunriseIs
             opacity="0.6"
           />
         )}
-        {/* Sun dot */}
         <circle cx={sunX} cy={sunY} r="8" fill={isAboveHorizon ? '#f59e0b' : 'rgba(245,158,11,0.3)'} />
-        {/* Labels */}
-        <text x="10" y="116" textAnchor="middle" fontFamily="Inter" fontSize="11" fill={isDark ? 'rgba(255,255,255,0.6)' : '#717783'}>
-          {formatLocalTime(sunriseIso)}
-        </text>
-        <text x="190" y="116" textAnchor="middle" fontFamily="Inter" fontSize="11" fill={isDark ? 'rgba(255,255,255,0.6)' : '#717783'}>
-          {formatLocalTime(sunsetIso)}
-        </text>
       </svg>
 
-      <p style={{ fontFamily: 'Inter', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.6)' : '#717783', textAlign: 'center', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-        {h}h {m}min Tageslicht
-      </p>
+      {/* Footer: daylight + UV */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 11, color: labelColor, fontVariantNumeric: 'tabular-nums' }}>
+          {h}h {m}min Tageslicht
+        </p>
+        {uvIndex > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 13, color: '#f59e0b' }}>wb_sunny</span>
+            <p style={{ fontFamily: 'Inter', fontSize: 11, color: labelColor, fontVariantNumeric: 'tabular-nums' }}>
+              UV {uvIndex}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -101,6 +137,7 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
   const todayPrecip = daily.precipitation_sum[0];
   const tempSuffix = tempUnit === 'fahrenheit' ? '°F' : '°C';
   const windSuffix = windUnit === 'mph' ? 'mph' : 'km/h';
+  const currentUvIndex = Math.round(hourly.uv_index[currentHourIndex] ?? 0);
 
   const c = isDark
     ? { primary: 'rgba(255,255,255,0.95)', muted: 'rgba(255,255,255,0.6)', accent: '#fff', divider: 'rgba(255,255,255,0.2)' }
@@ -124,7 +161,7 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
         </p>
 
         <span
-          className={`material-symbols-outlined mat-fill${currentIcon === 'sunny' ? ' sun-animate' : ''}`}
+          className={`material-symbols-outlined mat-fill animate-pop-in${currentIcon === 'sunny' ? ' sun-animate' : ''}`}
           style={{ fontSize: 72, color: currentColor, lineHeight: 1, marginTop: 8 }}
         >{currentIcon}</span>
 
@@ -227,7 +264,7 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
         </div>
       </div>
 
-      {/* Bento grid */}
+      {/* Bento grid — Frosch zuerst, dann Sonne */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
 
         <div style={{ ...glassCard, padding: 16 }}>
@@ -252,7 +289,12 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
           <p style={{ fontFamily: 'Inter', fontSize: 12, color: c.muted, marginTop: 4 }}>Heute gesamt</p>
         </div>
 
-        {/* Sunrise/sunset + Wetterfrosch side by side */}
+        {/* Frosch zuerst */}
+        <div className="animate-frog-in">
+          <WetterfroschWidget code={current.weather_code} isDark={isDark} />
+        </div>
+
+        {/* Sonne danach */}
         {daily.sunrise?.[0] && daily.sunset?.[0] && (
           <div style={{ ...glassCard, padding: 16 }}>
             <SunArc
@@ -260,10 +302,10 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
               sunsetIso={daily.sunset[0]}
               utcOffsetSeconds={weather.utc_offset_seconds}
               isDark={isDark}
+              uvIndex={currentUvIndex}
             />
           </div>
         )}
-        <WetterfroschWidget code={current.weather_code} isDark={isDark} />
 
       </div>
 
