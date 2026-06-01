@@ -113,7 +113,7 @@ export default function WetterfroschWidget({ code, isDark = false }: Wetterfrosc
               src={FROGS[rung]}
               alt=""
               aria-hidden="true"
-              style={{ width: 52, height: 52, objectFit: 'contain', display: 'block', userSelect: 'none' }}
+              style={{ width: 52, height: 52, objectFit: 'contain', display: 'block', userSelect: 'none', clipPath: 'inset(0 0 13% 0)' }}
             />
           </div>
         </div>
