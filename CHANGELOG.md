@@ -4,6 +4,14 @@ Alle relevanten Änderungen an der App, gegliedert nach Version.
 
 ---
 
+## v1.6 — 1. Juni 2026
+
+- Wetterfrosch: vier eigene Illustrationen (Sonnenbrille / freundlich / bewölkt / Regen) zeigen die aktuelle Wetterlage auf einer Holzleiter
+- Frosch-Kachel im Glas-Stil neben dem Sonnenverlauf im Bento-Grid
+- Leiter mit Bodenelement, kein Rung-Highlight
+
+---
+
 ## v1.5 — 21. Mai 2026
 
 - Stündliche Vorhersage springt automatisch zur aktuellen Uhrzeit (`scrollIntoView`)

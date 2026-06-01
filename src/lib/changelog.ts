@@ -6,6 +6,14 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.6',
+    date: '1. Juni 2026',
+    items: [
+      { icon: 'cruelty_free', text: 'Wetterfrosch: vier eigene Illustrationen zeigen die Wetterlage auf einer Leiter' },
+      { icon: 'view_quilt',   text: 'Frosch-Kachel im Glas-Stil neben dem Sonnenverlauf' },
+    ],
+  },
+  {
     version: '1.5',
     date: '21. Mai 2026',
     items: [
