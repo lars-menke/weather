@@ -61,22 +61,33 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         ref={containerRef}
         style={{ position: 'relative', width: 96, height: 96 }}
       >
-        {/* Ghost sun */}
+        {/* Ghost sun — hand-drawn outline */}
         <div style={{
           position: 'absolute', inset: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           pointerEvents: 'none',
         }}>
-          <span
-            className="material-symbols-outlined mat-fill"
-            style={{
-              fontSize: 170,
-              color: '#f59e0b',
-              opacity: 0.18,
-              lineHeight: 1,
-              animation: 'sun-pulse 4s ease-in-out infinite',
-            }}
-          >wb_sunny</span>
+          <svg
+            viewBox="0 0 100 100"
+            fill="none"
+            style={{ width: 170, height: 170, opacity: 0.22, animation: 'sun-pulse 4s ease-in-out infinite' }}
+            aria-hidden="true"
+          >
+            {/* Slightly imperfect circle */}
+            <path
+              d="M 50 27 C 64 25, 75 36, 74 50 C 73 64, 62 75, 50 74 C 37 74, 25 63, 26 50 C 26 37, 36 25, 50 27 Z"
+              stroke="#f59e0b" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"
+            />
+            {/* 8 rays — subtle curves for hand-drawn feel */}
+            <path d="M 50 21 Q 48 15 50 10"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
+            <path d="M 67 33 Q 73 27 78 22"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
+            <path d="M 79 50 Q 85 51 91 49"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
+            <path d="M 67 67 Q 73 73 78 78"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
+            <path d="M 50 79 Q 52 85 50 91"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
+            <path d="M 33 67 Q 27 73 22 78"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
+            <path d="M 21 50 Q 15 49 9 51"    stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
+            <path d="M 33 33 Q 27 27 22 22"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
+          </svg>
         </div>
 
         {/* Frog */}
