@@ -2,6 +2,7 @@ import { getWeatherInfo } from '../components/WeatherIcon';
 import { getMatIcon } from '../lib/weatherCodes';
 import RadarTile from '../components/RadarTile';
 import AlertBanner from '../components/AlertBanner';
+import WetterfroschWidget from '../components/WetterfroschWidget';
 import type { WeatherResponse, TempUnit, WindUnit, WeatherAlert } from '../types/weather';
 
 interface DashboardProps {
@@ -271,6 +272,9 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
         )}
 
       </div>
+
+      {/* Wetterfrosch */}
+      <WetterfroschWidget code={current.weather_code} isDark={isDark} />
 
       {/* Radar tile — ganz unten */}
       <div>
