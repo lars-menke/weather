@@ -68,11 +68,11 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
           aria-hidden="true"
           style={{
             position: 'absolute',
-            top: -62,
-            left: 8,
-            width: 164, height: 164,
+            top: -80,
+            left: 36,
+            width: 168, height: 168,
             objectFit: 'contain',
-            opacity: 0.55,
+            opacity: 0.8,
             animation: 'sun-pulse 4s ease-in-out infinite',
             pointerEvents: 'none',
             userSelect: 'none',
