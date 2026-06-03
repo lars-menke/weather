@@ -4,6 +4,19 @@ Alle relevanten Änderungen an der App, gegliedert nach Version.
 
 ---
 
+## v1.9 — 3. Juni 2026
+
+- Alle Grafiken durch korrigierte, vollständig transparente Versionen ersetzt
+- Leiter als PNG-Illustration mit Pflanzen am Sockel
+- Frog-Positionen pixelgenau auf die Leitersprossен kalibriert
+
+## v1.8 — 3. Juni 2026
+
+- Vier neue Frosch-Illustrationen (Sonnenbrille / freundlich / bewölkt / Regen) mit transparentem Hintergrund
+- Pflanzen am Fuß der Leiter
+- Frosch-Kachel im verbesserten Glasmorphismus-Stil
+- PWA-Icons aus der neuen Sonnen-Illustration generiert
+
 ## v1.7 — 1. Juni 2026
 
 - App umbenannt in **FrogWeather** – Der Wetterfrosch fürs iPhone (Titel, PWA-Manifest, Splash)

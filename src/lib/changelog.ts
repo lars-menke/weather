@@ -6,6 +6,25 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.9',
+    date: '3. Juni 2026',
+    items: [
+      { icon: 'cruelty_free', text: 'Alle Grafiken durch korrigierte, vollständig transparente Versionen ersetzt' },
+      { icon: 'stairs',       text: 'Leiter jetzt als PNG-Illustration mit Pflanzen am Sockel' },
+      { icon: 'tune',         text: 'Frog-Positionen pixelgenau auf die Leitersprossен kalibriert' },
+    ],
+  },
+  {
+    version: '1.8',
+    date: '3. Juni 2026',
+    items: [
+      { icon: 'cruelty_free', text: 'Vier neue Frosch-Illustrationen mit transparentem Hintergrund' },
+      { icon: 'local_florist', text: 'Pflanzen am Fuß der Leiter' },
+      { icon: 'water_drop',   text: 'Frosch-Kachel im verbesserten Glasmorphismus-Stil' },
+      { icon: 'apps',         text: 'PWA-Icons aus der neuen Sonnen-Illustration generiert' },
+    ],
+  },
+  {
     version: '1.7',
     date: '1. Juni 2026',
     items: [
