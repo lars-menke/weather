@@ -31,6 +31,7 @@ function AlertItem({ alert, isDark }: { alert: WeatherAlert; isDark: boolean }) 
 
   return (
     <div
+      onClick={needsTruncation ? () => setExpanded(e => !e) : undefined}
       style={{
         background: cfg.bg,
         border: `1px solid ${cfg.border}`,
@@ -40,6 +41,8 @@ function AlertItem({ alert, isDark }: { alert: WeatherAlert; isDark: boolean }) 
         gap: 10,
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
+        cursor: needsTruncation ? 'pointer' : 'default',
+        WebkitTapHighlightColor: 'transparent',
       }}
     >
       <span
@@ -49,27 +52,19 @@ function AlertItem({ alert, isDark }: { alert: WeatherAlert; isDark: boolean }) 
         {cfg.icon}
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 700, color: cfg.iconColor, marginBottom: 3 }}>
-          {alert.headline}
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 3 }}>
+          <p style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 700, color: cfg.iconColor, flex: 1 }}>
+            {alert.headline}
+          </p>
+          {needsTruncation && (
+            <span className="material-symbols-outlined" style={{ fontSize: 18, color: cfg.iconColor, flexShrink: 0, marginLeft: 4 }}>
+              {expanded ? 'expand_less' : 'expand_more'}
+            </span>
+          )}
+        </div>
         <p style={{ fontFamily: 'Inter', fontSize: 12, color: textPrimary, lineHeight: 1.5, marginBottom: 6, whiteSpace: 'pre-line' }}>
           {displayText}
         </p>
-        {needsTruncation && (
-          <button
-            onClick={() => setExpanded(e => !e)}
-            style={{
-              background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-              fontFamily: 'Inter', fontSize: 12, fontWeight: 600,
-              color: cfg.iconColor, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 2,
-            }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
-              {expanded ? 'expand_less' : 'expand_more'}
-            </span>
-            {expanded ? 'Weniger anzeigen' : 'Vollständig lesen'}
-          </button>
-        )}
         <p style={{ fontFamily: 'Inter', fontSize: 11, color: textMuted, fontVariantNumeric: 'tabular-nums' }}>
           {formatDt(alert.onset)} – {formatDt(alert.expires)} Uhr
         </p>
