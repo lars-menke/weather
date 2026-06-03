@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import froschSun from '../assets/frog/frosch_01_sonnebrille.png';
+import sonneImg  from '../assets/sonne.png';
 
 export function SplashScreen({ onDone }: { onDone: () => void }) {
   const onDoneRef    = useRef(onDone);
@@ -56,41 +57,28 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         gap: 16,
       }}
     >
-      {/* Frog in front, sun ghostly behind */}
+      {/* Frog in front, sun upper-right behind */}
       <div
         ref={containerRef}
         style={{ position: 'relative', width: 96, height: 96 }}
       >
-        {/* Ghost sun — hand-drawn outline, upper-right of frog */}
-        <svg
-          viewBox="0 0 100 100"
-          fill="none"
+        {/* Sun image — upper-right, partially behind frog */}
+        <img
+          src={sonneImg}
+          alt=""
+          aria-hidden="true"
           style={{
             position: 'absolute',
-            top: -58,
-            left: 10,
-            width: 170, height: 170,
-            opacity: 0.22,
+            top: -62,
+            left: 8,
+            width: 164, height: 164,
+            objectFit: 'contain',
+            opacity: 0.55,
             animation: 'sun-pulse 4s ease-in-out infinite',
             pointerEvents: 'none',
+            userSelect: 'none',
           }}
-          aria-hidden="true"
-        >
-            {/* Slightly imperfect circle */}
-            <path
-              d="M 50 27 C 64 25, 75 36, 74 50 C 73 64, 62 75, 50 74 C 37 74, 25 63, 26 50 C 26 37, 36 25, 50 27 Z"
-              stroke="#f59e0b" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"
-            />
-            {/* 8 rays — subtle curves for hand-drawn feel */}
-            <path d="M 50 21 Q 48 15 50 10"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
-            <path d="M 67 33 Q 73 27 78 22"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
-            <path d="M 79 50 Q 85 51 91 49"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
-            <path d="M 67 67 Q 73 73 78 78"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
-            <path d="M 50 79 Q 52 85 50 91"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
-            <path d="M 33 67 Q 27 73 22 78"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
-            <path d="M 21 50 Q 15 49 9 51"    stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
-            <path d="M 33 33 Q 27 27 22 22"   stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round"/>
-        </svg>
+        />
 
         {/* Frog */}
         <img
