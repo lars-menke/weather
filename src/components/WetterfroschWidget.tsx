@@ -19,12 +19,12 @@ function getRung(code: number): 1 | 2 | 3 | 4 {
 
 const FROGS: Record<number, string> = { 4: frosch1, 3: frosch2, 2: frosch3, 1: frosch4 };
 
-// Ladder PNG is 1254×1254. Rendered at 120×120px inside the widget.
+// Ladder PNG is 500×500. Rendered at 120×120px inside the widget.
 // Rung centers measured from pixel scan (y in rendered 120px):
-//   rung4=22, rung3=43, rung2=66, rung1=88
+//   rung4=24, rung3=44, rung2=66, rung1=87
 // Inner container: 120×140 (20px top padding for top frog headroom)
 // Frog size 54px. FROG_TOP = rung_center + 20 (offset) - 42 (frog up-shift)
-const FROG_TOP: Record<number, number> = { 4: 0, 3: 21, 2: 44, 1: 66 };
+const FROG_TOP: Record<number, number> = { 4: 2, 3: 22, 2: 44, 1: 65 };
 
 export default function WetterfroschWidget({ code, isDark = false }: WetterfroschWidgetProps) {
   const rung = getRung(code);
