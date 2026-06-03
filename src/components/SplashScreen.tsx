@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import froschSun from '../assets/frog/frosch_01_sonnebrille.png';
 import sonneImg  from '../assets/sonne.png';
-
 export function SplashScreen({ onDone }: { onDone: () => void }) {
   const onDoneRef    = useRef(onDone);
   const [fading, setFading] = useState(false);
