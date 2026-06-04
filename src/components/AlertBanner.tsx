@@ -8,7 +8,7 @@ const SEVERITY: Record<string, { bg: string; border: string; iconColor: string; 
   extreme:  { bg: 'rgba(124,58,237,0.18)',  border: 'rgba(124,58,237,0.45)', iconColor: '#a855f7', label: 'Extremes Unwetter', icon: 'thunderstorm' },
 };
 
-const TRUNCATE_AT = 120;
+const TRUNCATE_AT = 80;
 
 function formatDt(iso: string): string {
   return new Date(iso).toLocaleString('de-DE', {
@@ -65,9 +65,23 @@ function AlertItem({ alert, isDark }: { alert: WeatherAlert; isDark: boolean }) 
         <p style={{ fontFamily: 'Inter', fontSize: 12, color: textPrimary, lineHeight: 1.5, marginBottom: 6, whiteSpace: 'pre-line' }}>
           {displayText}
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 11, color: textMuted, fontVariantNumeric: 'tabular-nums' }}>
-          {formatDt(alert.onset)} – {formatDt(alert.expires)} Uhr
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
+          <p style={{ fontFamily: 'Inter', fontSize: 11, color: textMuted, fontVariantNumeric: 'tabular-nums' }}>
+            {formatDt(alert.onset)} – {formatDt(alert.expires)} Uhr
+          </p>
+          {alert.url && (
+            <a
+              href={alert.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: cfg.iconColor, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0, marginLeft: 8 }}
+            >
+              DWD
+              <span className="material-symbols-outlined" style={{ fontSize: 12 }}>open_in_new</span>
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );

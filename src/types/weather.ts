@@ -69,6 +69,7 @@ export interface WeatherAlert {
   urgency: string;
   onset: string;
   expires: string;
+  url?: string | null;
 }
 
 export interface WeatherInfo {

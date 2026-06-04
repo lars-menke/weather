@@ -292,7 +292,7 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
         </div>
 
         {/* Frosch zuerst */}
-        <div className="animate-frog-in">
+        <div className="animate-frog-in" style={{ height: '100%' }}>
           <WetterfroschWidget code={current.weather_code} isDark={isDark} />
         </div>
 

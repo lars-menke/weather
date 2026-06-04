@@ -42,20 +42,21 @@ export default function WetterfroschWidget({ code, isDark = false }: Wetterfrosc
       style={{
         position: 'relative',
         overflow: 'hidden',
-        borderRadius: '14px 14px 20px 20px',
+        borderRadius: 16,
         cursor: 'pointer',
         WebkitTapHighlightColor: 'transparent',
+        height: '100%',
         background: isDark
-          ? 'linear-gradient(175deg, rgba(180,220,255,0.18) 0%, rgba(130,185,255,0.08) 60%, rgba(100,160,240,0.14) 100%)'
-          : 'linear-gradient(175deg, rgba(215,238,255,0.70) 0%, rgba(185,225,255,0.40) 55%, rgba(160,210,255,0.55) 100%)',
+          ? 'linear-gradient(160deg, rgba(255,255,255,0.16) 0%, rgba(180,220,255,0.08) 100%)'
+          : 'linear-gradient(160deg, rgba(255,255,255,0.82) 0%, rgba(220,238,255,0.58) 60%, rgba(200,228,255,0.68) 100%)',
         border: isDark
-          ? '1.5px solid rgba(170,210,255,0.28)'
-          : '1.5px solid rgba(190,225,255,0.80)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+          ? '1px solid rgba(255,255,255,0.22)'
+          : '1px solid rgba(255,255,255,0.85)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
         boxShadow: isDark
-          ? 'inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.10)'
-          : 'inset 0 1.5px 0 rgba(255,255,255,0.90), inset 0 -1px 0 rgba(160,200,255,0.25), 0 2px 8px rgba(100,160,230,0.10)',
+          ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 12px rgba(0,0,0,0.18)'
+          : 'inset 0 1.5px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(180,210,255,0.3), 0 2px 12px rgba(100,160,230,0.12)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'flex-end',
