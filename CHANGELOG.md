@@ -4,6 +4,13 @@ Alle relevanten Änderungen an der App, gegliedert nach Version.
 
 ---
 
+## v2.0 — 4. Juni 2026
+
+- Sechs neue Frosch-Illustrationen – inkl. Schnee-Frosch und Logo
+- Schneewetter wird jetzt separat erkannt und mit eigenem Frosch dargestellt
+- Frosch-Kachel ohne Leiter – der Frosch steht direkt im Tile
+- Nicht verwendete Assets entfernt, Repo aufgeräumt
+
 ## v1.9 — 3. Juni 2026
 
 - Alle Grafiken durch korrigierte, vollständig transparente Versionen ersetzt

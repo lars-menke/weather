@@ -6,6 +6,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.0',
+    date: '4. Juni 2026',
+    items: [
+      { icon: 'cruelty_free',  text: 'Sechs neue Frosch-Illustrationen – inkl. Schnee-Frosch und Logo' },
+      { icon: 'ac_unit',       text: 'Schneewetter wird jetzt separat erkannt und mit eigenem Frosch dargestellt' },
+      { icon: 'grid_view',     text: 'Frosch-Kachel ohne Leiter – der Frosch steht direkt im Tile' },
+      { icon: 'auto_fix_high', text: 'Nicht verwendete Assets entfernt, Repo aufgeräumt' },
+    ],
+  },
+  {
     version: '1.9',
     date: '3. Juni 2026',
     items: [

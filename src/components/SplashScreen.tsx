@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import froschSun from '../assets/frog/frosch_01_sonnebrille.png';
-import sonneImg  from '../assets/sonne.png';
+import logoImg from '../assets/frog/frosch_00_logo.png';
+
 export function SplashScreen({ onDone }: { onDone: () => void }) {
   const onDoneRef    = useRef(onDone);
   const [fading, setFading] = useState(false);
@@ -56,38 +56,15 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         gap: 16,
       }}
     >
-      {/* Frog in front, sun upper-right behind */}
-      <div
-        ref={containerRef}
-        style={{ position: 'relative', width: 96, height: 96 }}
-      >
-        {/* Sun image — upper-right, partially behind frog */}
+      <div ref={containerRef}>
         <img
-          src={sonneImg}
-          alt=""
-          aria-hidden="true"
+          src={logoImg}
+          alt="FrogWeather Logo"
           style={{
-            position: 'absolute',
-            top: -80,
-            left: 36,
-            width: 168, height: 168,
+            width: 240,
             objectFit: 'contain',
-            opacity: 0.8,
-            animation: 'sun-pulse 4s ease-in-out infinite',
-            pointerEvents: 'none',
             userSelect: 'none',
-          }}
-        />
-
-        {/* Frog */}
-        <img
-          src={froschSun}
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: 'relative', zIndex: 1,
-            width: 96, height: 96,
-            objectFit: 'contain', userSelect: 'none',
+            display: 'block',
           }}
         />
       </div>
