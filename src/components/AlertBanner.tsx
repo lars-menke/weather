@@ -24,6 +24,7 @@ function AlertItem({ alert, isDark }: { alert: WeatherAlert; isDark: boolean }) 
   const textMuted   = isDark ? 'rgba(255,255,255,0.6)'  : '#717783';
 
   const fullText = [alert.description, alert.instruction].filter(Boolean).join('\n\n');
+  const hasText = fullText.length > 0;
   const needsTruncation = fullText.length > TRUNCATE_AT;
   const displayText = needsTruncation && !expanded
     ? fullText.slice(0, TRUNCATE_AT).trimEnd() + '…'
@@ -52,7 +53,7 @@ function AlertItem({ alert, isDark }: { alert: WeatherAlert; isDark: boolean }) 
         {cfg.icon}
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 3 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: hasText ? 4 : 6 }}>
           <p style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 700, color: cfg.iconColor, flex: 1 }}>
             {alert.headline}
           </p>
@@ -62,14 +63,36 @@ function AlertItem({ alert, isDark }: { alert: WeatherAlert; isDark: boolean }) 
             </span>
           )}
         </div>
-        <p style={{ fontFamily: 'Inter', fontSize: 12, color: textPrimary, lineHeight: 1.5, marginBottom: 6, whiteSpace: 'pre-line' }}>
-          {displayText}
-        </p>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
+
+        {hasText && (
+          <p style={{ fontFamily: 'Inter', fontSize: 12, color: textPrimary, lineHeight: 1.5, marginBottom: 6, whiteSpace: 'pre-line' }}>
+            {displayText}
+          </p>
+        )}
+
+        {/* If API returns no text body, show a prominent link to the full DWD warning */}
+        {!hasText && alert.url && (
+          <a
+            href={alert.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              fontFamily: 'Inter', fontSize: 12, fontWeight: 600,
+              color: cfg.iconColor, textDecoration: 'none',
+              marginBottom: 6,
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>open_in_new</span>
+            Vollständige Warnung auf dwd.de lesen
+          </a>
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <p style={{ fontFamily: 'Inter', fontSize: 11, color: textMuted, fontVariantNumeric: 'tabular-nums' }}>
             {formatDt(alert.onset)} – {formatDt(alert.expires)} Uhr
           </p>
-          {alert.url && (
+          {hasText && alert.url && (
             <a
               href={alert.url}
               target="_blank"
