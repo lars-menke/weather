@@ -5,7 +5,20 @@ export async function fetchAlerts(lat: number, lon: number): Promise<WeatherAler
     const res = await fetch(`https://api.brightsky.dev/alerts?lat=${lat}&lon=${lon}`);
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.alerts ?? []) as WeatherAlert[];
+    // Bright Sky uses localized field names (headline_de, description_de, etc.)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (data.alerts ?? []).map((a: any): WeatherAlert => ({
+      id: a.id,
+      headline: a.headline_de ?? a.headline_en ?? '',
+      description: a.description_de ?? a.description_en ?? '',
+      instruction: a.instruction_de ?? a.instruction_en ?? null,
+      event: a.event_de ?? a.event_en ?? '',
+      severity: a.severity,
+      urgency: a.urgency,
+      onset: a.onset,
+      expires: a.expires,
+      url: a.url ?? null,
+    }));
   } catch {
     return [];
   }
