@@ -28,6 +28,14 @@ const FROGS: Record<Condition, string> = {
   snow:    frosch5,
 };
 
+const LABELS: Record<Condition, string> = {
+  sunny:   'Sonnig',
+  neutral: 'Leicht bewölkt',
+  cloudy:  'Bewölkt',
+  rain:    'Regen',
+  snow:    'Schnee',
+};
+
 export default function WetterfroschWidget({ code, isDark = false }: WetterfroschWidgetProps) {
   const condition = getCondition(code);
   const [tapping, setTapping] = useState(false);
@@ -53,8 +61,11 @@ export default function WetterfroschWidget({ code, isDark = false }: Wetterfrosc
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        gap: 8,
+        padding: '12px 8px 16px',
       }}
     >
       <div className={tapping ? 'frog-tap-hop' : ''}>
@@ -63,16 +74,23 @@ export default function WetterfroschWidget({ code, isDark = false }: Wetterfrosc
           alt=""
           aria-hidden="true"
           style={{
-            width: 100,
-            height: 100,
+            width: 96,
+            height: 96,
             objectFit: 'contain',
             display: 'block',
             userSelect: 'none',
             pointerEvents: 'none',
-            transition: 'opacity 0.3s ease',
           }}
         />
       </div>
+      <span style={{
+        fontFamily: 'Inter',
+        fontSize: 12,
+        fontWeight: 500,
+        color: isDark ? 'rgba(255,255,255,0.55)' : '#717783',
+      }}>
+        {LABELS[condition]}
+      </span>
     </div>
   );
 }

@@ -4,6 +4,15 @@ Alle relevanten Änderungen an der App, gegliedert nach Version.
 
 ---
 
+## v2.1 — 4. Juni 2026
+
+- Zuletzt-aktualisiert-Zeitstempel im Dashboard-Hero
+- Warnungs-Header zeigt Anzahl aktiver Meldungen mit rotem Badge
+- Section-Header mit Icons statt reiner Uppercase-Typografie
+- Frosch-Kachel zeigt Wetterlaune als Text (Sonnig, Regen …)
+- Retry-Button im Fehlerbanner lädt Daten sofort neu
+- Glass-Token konsolidiert: makeGlass() als zentrale Quelle
+
 ## v2.0 — 4. Juni 2026
 
 - Sechs neue Frosch-Illustrationen – inkl. Schnee-Frosch und Logo

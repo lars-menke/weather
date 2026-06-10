@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { TempUnit, WindUnit } from '../types/weather';
 import { CHANGELOG, APP_VERSION } from '../lib/changelog';
+import { makeGlass } from '../lib/glassStyle';
 
 interface Props {
   tempUnit: TempUnit;
@@ -88,14 +89,7 @@ function SectionLabel({ children, isDark }: { children: React.ReactNode; isDark?
 export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindUnit, isDark = false }: Props) {
   const [expandedVersion, setExpandedVersion] = useState<string | null>(CHANGELOG[0].version);
 
-  const glassCard: React.CSSProperties = {
-    background: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.5)',
-    borderRadius: 16,
-    border: isDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.6)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-    overflow: 'hidden',
-  };
+  const glassCard = { ...makeGlass(isDark), overflow: 'hidden' as const };
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 8 }}>

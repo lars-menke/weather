@@ -1,5 +1,6 @@
 import { getWeatherInfo } from '../components/WeatherIcon';
 import { getMatIcon } from '../lib/weatherCodes';
+import { makeGlass } from '../lib/glassStyle';
 import RadarTile from '../components/RadarTile';
 import AlertBanner from '../components/AlertBanner';
 import WetterfroschWidget from '../components/WetterfroschWidget';
@@ -16,6 +17,7 @@ interface DashboardProps {
   lon: number;
   alerts: WeatherAlert[];
   isDark?: boolean;
+  lastUpdated?: Date | null;
   onNavigateToRadar: () => void;
 }
 
@@ -28,6 +30,31 @@ function formatLocalTime(isoLocal: string): string {
 function utcMsToLocalHHMM(utcMs: number, utcOffsetSeconds: number): string {
   const d = new Date(utcMs + utcOffsetSeconds * 1000);
   return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+}
+
+function SectionHeader({
+  icon, children, badge, isDark,
+}: {
+  icon: string; children: React.ReactNode; badge?: number; isDark: boolean;
+}) {
+  const active = (badge ?? 0) > 0;
+  const iconColor = active ? '#ef4444' : (isDark ? 'rgba(255,255,255,0.45)' : '#a0aab4');
+  const textColor = active ? '#ef4444' : (isDark ? 'rgba(255,255,255,0.6)'  : '#717783');
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, paddingLeft: 2 }}>
+      <span className="material-symbols-outlined" style={{ fontSize: 16, color: iconColor }}>{icon}</span>
+      <span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 600, color: textColor }}>{children}</span>
+      {active && (
+        <span style={{
+          background: '#ef4444', color: '#fff',
+          fontSize: 10, fontWeight: 700, fontFamily: 'Inter',
+          lineHeight: 1, padding: '2px 6px', borderRadius: 10,
+        }}>
+          {badge}
+        </span>
+      )}
+    </div>
+  );
 }
 
 function SunArc({
@@ -50,15 +77,14 @@ function SunArc({
   const sunY = 100 - 90 * Math.sin(angle);
   const isAboveHorizon = nowMs >= sunriseMs && nowMs <= sunsetMs;
 
-  const goldenMornEnd   = utcMsToLocalHHMM(sunriseMs + 3600000,  utcOffsetSeconds);
-  const goldenEvenStart = utcMsToLocalHHMM(sunsetMs  - 3600000,  utcOffsetSeconds);
+  const goldenMornEnd   = utcMsToLocalHHMM(sunriseMs + 3600000, utcOffsetSeconds);
+  const goldenEvenStart = utcMsToLocalHHMM(sunsetMs  - 3600000, utcOffsetSeconds);
 
-  const labelColor = isDark ? 'rgba(255,255,255,0.6)' : '#717783';
+  const labelColor  = isDark ? 'rgba(255,255,255,0.6)' : '#717783';
   const primaryColor = isDark ? 'rgba(255,255,255,0.9)' : '#0b1c30';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-      {/* Sunrise / Sunset header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
         <div>
           <p style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 600, color: primaryColor, fontVariantNumeric: 'tabular-nums' }}>
@@ -78,26 +104,20 @@ function SunArc({
         </div>
       </div>
 
-      {/* Arc SVG — fills available space */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 60 }}>
-      <svg viewBox="0 0 200 108" style={{ width: '100%', height: 'auto', overflow: 'visible' }} aria-hidden="true">
-        <line x1="10" y1="100" x2="190" y2="100" stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'} strokeWidth="1" />
-        <path d="M 10,100 A 90,90 0 0 1 190,100" fill="none" stroke={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'} strokeWidth="2" strokeLinecap="round" />
-        {isAboveHorizon && (
-          <path
-            d={`M 10,100 A 90,90 0 0 1 ${sunX},${sunY}`}
-            fill="none"
-            stroke="#f59e0b"
-            strokeWidth="2"
-            strokeLinecap="round"
-            opacity="0.6"
-          />
-        )}
-        <circle cx={sunX} cy={sunY} r="8" fill={isAboveHorizon ? '#f59e0b' : 'rgba(245,158,11,0.3)'} />
-      </svg>
+        <svg viewBox="0 0 200 108" style={{ width: '100%', height: 'auto', overflow: 'visible' }} aria-hidden="true">
+          <line x1="10" y1="100" x2="190" y2="100" stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'} strokeWidth="1" />
+          <path d="M 10,100 A 90,90 0 0 1 190,100" fill="none" stroke={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'} strokeWidth="2" strokeLinecap="round" />
+          {isAboveHorizon && (
+            <path
+              d={`M 10,100 A 90,90 0 0 1 ${sunX},${sunY}`}
+              fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" opacity="0.6"
+            />
+          )}
+          <circle cx={sunX} cy={sunY} r="8" fill={isAboveHorizon ? '#f59e0b' : 'rgba(245,158,11,0.3)'} />
+        </svg>
       </div>
 
-      {/* Footer: daylight + UV */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
         <p style={{ fontFamily: 'Inter', fontSize: 11, color: labelColor, fontVariantNumeric: 'tabular-nums' }}>
           {h}h {m}min Tageslicht
@@ -105,9 +125,7 @@ function SunArc({
         {uvIndex > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 13, color: '#f59e0b' }}>wb_sunny</span>
-            <p style={{ fontFamily: 'Inter', fontSize: 11, color: labelColor, fontVariantNumeric: 'tabular-nums' }}>
-              UV {uvIndex}
-            </p>
+            <p style={{ fontFamily: 'Inter', fontSize: 11, color: labelColor, fontVariantNumeric: 'tabular-nums' }}>UV {uvIndex}</p>
           </div>
         )}
       </div>
@@ -115,17 +133,17 @@ function SunArc({
   );
 }
 
-export default function Dashboard({ weather, cityName, country, timezone, tempUnit, windUnit, lat, lon, alerts, isDark = false, onNavigateToRadar }: DashboardProps) {
+export default function Dashboard({
+  weather, cityName, country, timezone, tempUnit, windUnit,
+  lat, lon, alerts, isDark = false, lastUpdated, onNavigateToRadar,
+}: DashboardProps) {
   const { current, daily, hourly } = weather;
   const info = getWeatherInfo(current.weather_code);
   const { icon: currentIcon, color: currentColor } = getMatIconLocal(current.weather_code);
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('de-DE', {
-    timeZone: timezone,
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
+    timeZone: timezone, weekday: 'long', day: 'numeric', month: 'long',
   });
 
   const nowISO = now.toISOString().slice(0, 13);
@@ -134,24 +152,18 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
 
   const hourlySlice = hourly.time.slice(currentHourIndex, currentHourIndex + 24);
 
-  const todayMax = Math.round(daily.temperature_2m_max[0]);
-  const todayMin = Math.round(daily.temperature_2m_min[0]);
+  const todayMax   = Math.round(daily.temperature_2m_max[0]);
+  const todayMin   = Math.round(daily.temperature_2m_min[0]);
   const todayPrecip = daily.precipitation_sum[0];
-  const tempSuffix = tempUnit === 'fahrenheit' ? '°F' : '°C';
-  const windSuffix = windUnit === 'mph' ? 'mph' : 'km/h';
+  const tempSuffix  = tempUnit === 'fahrenheit' ? '°F' : '°C';
+  const windSuffix  = windUnit === 'mph' ? 'mph' : 'km/h';
   const currentUvIndex = Math.round(hourly.uv_index[currentHourIndex] ?? 0);
 
   const c = isDark
     ? { primary: 'rgba(255,255,255,0.95)', muted: 'rgba(255,255,255,0.6)', accent: '#fff', divider: 'rgba(255,255,255,0.2)' }
     : { primary: '#0b1c30',               muted: '#717783',                accent: '#0060ac', divider: 'rgba(0,0,0,0.12)' };
 
-  const glassCard: React.CSSProperties = {
-    background: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.5)',
-    borderRadius: 16,
-    border: isDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.6)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-  };
+  const glassCard = makeGlass(isDark);
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -182,9 +194,16 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
         <p style={{ fontFamily: 'Inter', fontSize: 14, color: c.muted, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
           Gefühlt {Math.round(current.apparent_temperature)}{tempSuffix}
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 13, color: c.muted, marginTop: 2 }}>
-          {dateStr}
-        </p>
+        <p style={{ fontFamily: 'Inter', fontSize: 13, color: c.muted, marginTop: 2 }}>{dateStr}</p>
+
+        {lastUpdated && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 3 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 12, color: c.muted, opacity: 0.65 }}>sync</span>
+            <p style={{ fontFamily: 'Inter', fontSize: 11, color: c.muted, opacity: 0.65, fontVariantNumeric: 'tabular-nums' }}>
+              {lastUpdated.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr
+            </p>
+          </div>
+        )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -203,11 +222,15 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
         </div>
       </div>
 
-      {/* Warnings */}
+      {/* Warnungen */}
       <div>
-        <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: c.muted, marginBottom: 8, paddingLeft: 4 }}>
+        <SectionHeader
+          icon={alerts.length > 0 ? 'warning' : 'notifications'}
+          badge={alerts.length || undefined}
+          isDark={isDark}
+        >
           Warnungen
-        </p>
+        </SectionHeader>
         {alerts.length === 0 ? (
           <div style={{ ...glassCard, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color: '#10b981', flexShrink: 0 }}>check_circle</span>
@@ -218,11 +241,9 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
         )}
       </div>
 
-      {/* Hourly strip */}
+      {/* Stündlich */}
       <div>
-        <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: c.muted, marginBottom: 8, paddingLeft: 4 }}>
-          Stündlich
-        </p>
+        <SectionHeader icon="schedule" isDark={isDark}>Stündlich</SectionHeader>
         <div style={{ ...glassCard, padding: '12px 8px' }}>
           <div className="hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', gap: 4 }}>
             {hourlySlice.map((timeStr, idx) => {
@@ -266,7 +287,7 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
         </div>
       </div>
 
-      {/* Bento grid — Frosch zuerst, dann Sonne */}
+      {/* Bento grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
 
         <div style={{ ...glassCard, padding: 16 }}>
@@ -291,12 +312,10 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
           <p style={{ fontFamily: 'Inter', fontSize: 12, color: c.muted, marginTop: 4 }}>Heute gesamt</p>
         </div>
 
-        {/* Frosch zuerst */}
         <div className="animate-frog-in" style={{ height: '100%' }}>
           <WetterfroschWidget code={current.weather_code} isDark={isDark} />
         </div>
 
-        {/* Sonne danach */}
         {daily.sunrise?.[0] && daily.sunset?.[0] && (
           <div style={{ ...glassCard, padding: 16, display: 'flex', flexDirection: 'column' }}>
             <SunArc
@@ -311,13 +330,12 @@ export default function Dashboard({ weather, cityName, country, timezone, tempUn
 
       </div>
 
-      {/* Radar tile — ganz unten */}
+      {/* Radar */}
       <div>
-        <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: c.muted, marginBottom: 8, paddingLeft: 4 }}>
-          Radar
-        </p>
+        <SectionHeader icon="radar" isDark={isDark}>Radar</SectionHeader>
         <RadarTile lat={lat} lon={lon} isDark={isDark} onExpand={onNavigateToRadar} />
       </div>
+
     </div>
   );
 }

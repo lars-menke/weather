@@ -50,6 +50,7 @@ export default function App() {
   const [windUnit, setWindUnit] = useState<WindUnit>(() => loadPref('windUnit', 'kmh'));
   const [favorites, setFavorites] = useState<Favorite[]>(loadFavorites);
   const [alerts, setAlerts] = useState<WeatherAlert[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const loadWeather = useCallback(async (lat: number, lon: number, city: string, countryName: string, tu: TempUnit, wu: WindUnit) => {
     setIsLoading(true);
@@ -57,6 +58,7 @@ export default function App() {
     try {
       const data = await fetchWeather(lat, lon, tu, wu);
       setWeather(data);
+      setLastUpdated(new Date());
       setCityName(city);
       setCountry(countryName);
       setCoords({ lat, lon });
@@ -223,6 +225,19 @@ export default function App() {
               <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#ba1a1a', flexShrink: 0 }}>warning</span>
               <p style={{ flex: 1, fontSize: 13, fontFamily: 'Inter', color: '#93000a' }}>{error}</p>
               <button
+                onClick={() => { setError(null); loadWeather(coords.lat, coords.lon, cityName, country, tempUnit, windUnit); }}
+                aria-label="Erneut versuchen"
+                style={{
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
+                  padding: '5px 10px', background: '#ba1a1a', border: 'none', borderRadius: 6,
+                  color: '#fff', fontFamily: 'Inter', fontSize: 12, fontWeight: 600, flexShrink: 0,
+                  minHeight: 32,
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>refresh</span>
+                Retry
+              </button>
+              <button
                 onClick={() => setError(null)}
                 aria-label="Fehler schließen"
                 style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 32, minHeight: 32, background: 'none', border: 'none', borderRadius: 6, flexShrink: 0 }}
@@ -257,6 +272,7 @@ export default function App() {
               lon={coords.lon}
               alerts={alerts}
               isDark={theme.isDark}
+              lastUpdated={lastUpdated}
               onNavigateToRadar={() => setActiveTab(2)}
             />
           )}

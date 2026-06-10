@@ -6,6 +6,18 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.1',
+    date: '4. Juni 2026',
+    items: [
+      { icon: 'sync',              text: 'Zuletzt-aktualisiert-Zeitstempel im Dashboard-Hero' },
+      { icon: 'warning',           text: 'Warnungs-Header zeigt Anzahl aktiver Meldungen mit rotem Badge' },
+      { icon: 'schedule',          text: 'Section-Header mit Icons statt reiner Uppercase-Typografie' },
+      { icon: 'cruelty_free',      text: 'Frosch-Kachel zeigt Wetterlaune als Text (Sonnig, Regen …)' },
+      { icon: 'refresh',           text: 'Retry-Button im Fehlerbanner lädt Daten sofort neu' },
+      { icon: 'tune',              text: 'Glass-Token konsolidiert: makeGlass() als zentrale Quelle' },
+    ],
+  },
+  {
     version: '2.0',
     date: '4. Juni 2026',
     items: [
