@@ -45,10 +45,11 @@ function SectionHeader({
       <span className="material-symbols-outlined" style={{ fontSize: 16, color: iconColor }}>{icon}</span>
       <span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 600, color: textColor }}>{children}</span>
       {active && (
-        <span style={{
+        <span className="badge-pop" style={{
           background: '#ef4444', color: '#fff',
           fontSize: 10, fontWeight: 700, fontFamily: 'Inter',
           lineHeight: 1, padding: '2px 6px', borderRadius: 10,
+          display: 'inline-block',
         }}>
           {badge}
         </span>
@@ -107,14 +108,31 @@ function SunArc({
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 60 }}>
         <svg viewBox="0 0 200 108" style={{ width: '100%', height: 'auto', overflow: 'visible' }} aria-hidden="true">
           <line x1="10" y1="100" x2="190" y2="100" stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'} strokeWidth="1" />
-          <path d="M 10,100 A 90,90 0 0 1 190,100" fill="none" stroke={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'} strokeWidth="2" strokeLinecap="round" />
+          {/* Background arc — draws in */}
+          <path
+            d="M 10,100 A 90,90 0 0 1 190,100"
+            fill="none"
+            stroke={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeDasharray="283"
+            style={{ animation: 'arc-draw 0.5s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+          />
+          {/* Progress arc — fades in after draw */}
           {isAboveHorizon && (
             <path
               d={`M 10,100 A 90,90 0 0 1 ${sunX},${sunY}`}
-              fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" opacity="0.6"
+              fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round"
+              style={{ animation: 'fade-in 0.25s 0.4s ease-out both' }}
+              opacity="0.6"
             />
           )}
-          <circle cx={sunX} cy={sunY} r="8" fill={isAboveHorizon ? '#f59e0b' : 'rgba(245,158,11,0.3)'} />
+          {/* Sun dot — pops in last */}
+          <circle
+            cx={sunX} cy={sunY} r="8"
+            fill={isAboveHorizon ? '#f59e0b' : 'rgba(245,158,11,0.3)'}
+            style={{ animation: 'sun-dot-pop 0.3s 0.45s cubic-bezier(0.16, 1, 0.3, 1) both', transformOrigin: `${sunX}px ${sunY}px` }}
+          />
         </svg>
       </div>
 
@@ -198,7 +216,11 @@ export default function Dashboard({
 
         {lastUpdated && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 3 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 12, color: c.muted, opacity: 0.65 }}>sync</span>
+            <span
+              key={lastUpdated.getTime()}
+              className="material-symbols-outlined sync-spin"
+              style={{ fontSize: 12, color: c.muted, opacity: 0.65 }}
+            >sync</span>
             <p style={{ fontFamily: 'Inter', fontSize: 11, color: c.muted, opacity: 0.65, fontVariantNumeric: 'tabular-nums' }}>
               {lastUpdated.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr
             </p>

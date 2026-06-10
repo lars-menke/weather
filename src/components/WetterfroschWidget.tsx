@@ -70,6 +70,8 @@ export default function WetterfroschWidget({ code, isDark = false }: Wetterfrosc
     >
       <div className={tapping ? 'frog-tap-hop' : ''}>
         <img
+          key={condition}
+          className="frog-condition-swap"
           src={FROGS[condition]}
           alt=""
           aria-hidden="true"
