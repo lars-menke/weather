@@ -65,7 +65,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
             objectFit: 'contain',
             userSelect: 'none',
             display: 'block',
-            filter: 'drop-shadow(0px 6px 32px rgba(0,60,120,0.26)) drop-shadow(0px 1px 6px rgba(0,0,0,0.10))',
+            filter: 'drop-shadow(0px 0px 32px rgba(0,60,120,0.30)) drop-shadow(0px 0px 10px rgba(0,0,0,0.12))',
           }}
         />
       </div>
