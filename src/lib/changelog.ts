@@ -6,6 +6,21 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.2',
+    date: '12. Juni 2026',
+    items: [
+      { icon: 'palette',       text: 'CSS-Design-Token-System: Farben via CSS Custom Properties, kein isDark-Ternär mehr' },
+      { icon: 'cruelty_free',  text: 'Frosch-Kachel: barrierefreiheits-konform (role=button, Tastaturnavigation)' },
+      { icon: 'refresh',       text: 'Pull-to-Refresh: Seite nach unten ziehen lädt Wetterdaten neu' },
+      { icon: 'wb_sunny',      text: 'Sonne im Tagesverlauf anklicken zeigt aktuelle Uhrzeit' },
+      { icon: 'show_chart',    text: 'Temperatur-Sparkline über der stündlichen Vorhersage' },
+      { icon: 'image',         text: 'Frosch-Bilder auf WebP umgestellt – ~40% kleinere Dateigröße' },
+      { icon: 'cruelty_free',  text: 'Frosch im Splash-Screen größer und mit Schatten' },
+      { icon: 'smartphone',    text: 'App auf max. 430px Breite begrenzt – zentriert auf Desktop' },
+      { icon: 'accessible',    text: 'Touch-Targets auf min. 44px angehoben (iOS HIG)' },
+    ],
+  },
+  {
     version: '2.1',
     date: '4. Juni 2026',
     items: [

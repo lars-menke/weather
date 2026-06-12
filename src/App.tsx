@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { SearchBar } from './components/SearchBar';
 import { SplashScreen } from './components/SplashScreen';
 import { TabBar } from './components/TabBar';
@@ -16,6 +16,7 @@ const DEFAULT_LAT = 53.5753;
 const DEFAULT_LON = 10.0153;
 const DEFAULT_CITY = 'Hamburg';
 const DEFAULT_COUNTRY = 'Deutschland';
+const PULL_THRESHOLD = 64;
 
 function loadPref<T extends string>(key: string, fallback: T): T {
   return (localStorage.getItem(key) as T | null) ?? fallback;
@@ -51,6 +52,9 @@ export default function App() {
   const [favorites, setFavorites] = useState<Favorite[]>(loadFavorites);
   const [alerts, setAlerts] = useState<WeatherAlert[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [pullDist, setPullDist] = useState(0);
+
+  const pullRef = useRef({ startY: 0, dist: 0 });
 
   const loadWeather = useCallback(async (lat: number, lon: number, city: string, countryName: string, tu: TempUnit, wu: WindUnit) => {
     setIsLoading(true);
@@ -76,7 +80,6 @@ export default function App() {
     loadWeather(loc.lat, loc.lon, loc.city, loc.country, tempUnit, windUnit);
   }, [loadWeather]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Fetch DWD weather alerts via Bright Sky whenever location changes, refresh every 15 min
   useEffect(() => {
     fetchAlerts(coords.lat, coords.lon).then(setAlerts);
     const id = setInterval(() => fetchAlerts(coords.lat, coords.lon).then(setAlerts), 15 * 60 * 1000);
@@ -145,6 +148,32 @@ export default function App() {
     loadWeather(coords.lat, coords.lon, cityName, country, tempUnit, u);
   }
 
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    pullRef.current.startY = e.touches[0].clientY;
+    pullRef.current.dist = 0;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (window.scrollY > 4) return;
+    const dy = e.touches[0].clientY - pullRef.current.startY;
+    if (dy > 0) {
+      const d = Math.min(dy * 0.55, PULL_THRESHOLD + 16);
+      pullRef.current.dist = d;
+      setPullDist(d);
+    } else {
+      pullRef.current.dist = 0;
+      setPullDist(0);
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (pullRef.current.dist >= PULL_THRESHOLD && !isLoading) {
+      loadWeather(coords.lat, coords.lon, cityName, country, tempUnit, windUnit);
+    }
+    pullRef.current.dist = 0;
+    setPullDist(0);
+  }, [isLoading, loadWeather, coords, cityName, country, tempUnit, windUnit]);
+
   const theme = weather
     ? getWeatherBackground(
         weather.current.weather_code,
@@ -161,13 +190,50 @@ export default function App() {
   }
 
   const isRadar = activeTab === 2;
+  const pullProgress = Math.min(pullDist / PULL_THRESHOLD, 1);
 
   return (
-    <div style={{ minHeight: '100dvh', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 60, position: 'relative', background: theme.background, transition: 'background 2s ease' }}>
+    <div
+      data-dark={theme.isDark ? 'true' : undefined}
+      onTouchStart={!isRadar ? handleTouchStart : undefined}
+      onTouchMove={!isRadar ? handleTouchMove : undefined}
+      onTouchEnd={!isRadar ? handleTouchEnd : undefined}
+      style={{ minHeight: '100dvh', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 60, position: 'relative', background: theme.background, transition: 'background 2s ease' }}
+    >
 
       {/* Weather particle animation */}
       {weather && (
         <WeatherAnimation code={weather.current.weather_code} isNight={theme.isNight} />
+      )}
+
+      {/* Pull-to-refresh indicator */}
+      {pullDist > 8 && (
+        <div style={{
+          position: 'fixed',
+          top: 'calc(env(safe-area-inset-top) + 60px)',
+          left: '50%',
+          transform: `translateX(-50%) translateY(${pullDist - 8}px)`,
+          zIndex: 50,
+          pointerEvents: 'none',
+          opacity: pullProgress,
+        }}>
+          <div style={{
+            background: 'rgba(255,255,255,0.92)',
+            borderRadius: 20,
+            width: 36, height: 36,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+          }}>
+            <span
+              className="material-symbols-outlined"
+              style={{
+                fontSize: 20,
+                color: '#0060ac',
+                transform: `rotate(${pullProgress * 360}deg)`,
+              }}
+            >refresh</span>
+          </div>
+        </div>
       )}
 
       {/* Radar screen renders outside the padded flow */}
@@ -181,14 +247,14 @@ export default function App() {
             aria-label={isFavorite ? 'Aus Favoriten entfernen' : 'Als Favorit speichern'}
             style={{
               width: 44, height: 44, borderRadius: 22, border: 'none',
-              background: theme.isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.06)',
+              background: 'var(--c-fill)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}
           >
             <span
               className={`material-symbols-outlined${isFavorite ? ' mat-fill' : ''}`}
-              style={{ fontSize: 20, color: isFavorite ? '#f59e0b' : (theme.isDark ? 'rgba(255,255,255,0.9)' : '#414751') }}
+              style={{ fontSize: 20, color: isFavorite ? '#f59e0b' : 'var(--c-primary)' }}
             >
               star
             </span>
@@ -231,7 +297,7 @@ export default function App() {
                   cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
                   padding: '5px 10px', background: '#ba1a1a', border: 'none', borderRadius: 6,
                   color: '#fff', fontFamily: 'Inter', fontSize: 12, fontWeight: 600, flexShrink: 0,
-                  minHeight: 32,
+                  minHeight: 44,
                 }}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: 14 }}>refresh</span>
@@ -240,7 +306,7 @@ export default function App() {
               <button
                 onClick={() => setError(null)}
                 aria-label="Fehler schließen"
-                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 32, minHeight: 32, background: 'none', border: 'none', borderRadius: 6, flexShrink: 0 }}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, background: 'none', border: 'none', borderRadius: 6, flexShrink: 0 }}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#93000a' }}>close</span>
               </button>

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import logoImg from '../assets/frog/frosch_00_logo.png';
+import logoImg from '../assets/frog/frosch_00_logo.webp';
 
 export function SplashScreen({ onDone }: { onDone: () => void }) {
   const onDoneRef    = useRef(onDone);
@@ -35,7 +35,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
     }
 
     const t1 = setTimeout(() => {
-      transitionIn(containerRef.current, 'opacity 0.55s ease, transform 0.7s cubic-bezier(0.34,1.56,0.64,1)', 'scale(1)');
+      transitionIn(containerRef.current, 'opacity 0.55s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)', 'scale(1)');
       transitionIn(titleRef.current,     'opacity 0.4s ease 0.25s, transform 0.4s ease 0.25s', 'translateY(0)');
       transitionIn(subRef.current,       'opacity 0.4s ease 0.4s,  transform 0.4s ease 0.4s',  'translateY(0)');
     }, 80);
@@ -61,10 +61,11 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
           src={logoImg}
           alt="FrogWeather Logo"
           style={{
-            width: 240,
+            width: 300,
             objectFit: 'contain',
             userSelect: 'none',
             display: 'block',
+            filter: 'drop-shadow(0px 10px 28px rgba(0,60,120,0.32)) drop-shadow(0px 2px 6px rgba(0,0,0,0.12))',
           }}
         />
       </div>

@@ -17,11 +17,9 @@ function formatDt(iso: string): string {
   });
 }
 
-function AlertItem({ alert, isDark }: { alert: WeatherAlert; isDark: boolean }) {
+function AlertItem({ alert }: { alert: WeatherAlert }) {
   const [expanded, setExpanded] = useState(false);
   const cfg = SEVERITY[alert.severity] ?? SEVERITY.minor;
-  const textPrimary = isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30';
-  const textMuted   = isDark ? 'rgba(255,255,255,0.6)'  : '#717783';
 
   const fullText = [alert.description, alert.instruction].filter(Boolean).join('\n\n');
   const hasText = fullText.length > 0;
@@ -65,12 +63,11 @@ function AlertItem({ alert, isDark }: { alert: WeatherAlert; isDark: boolean }) 
         </div>
 
         {hasText && (
-          <p style={{ fontFamily: 'Inter', fontSize: 12, color: textPrimary, lineHeight: 1.5, marginBottom: 6, whiteSpace: 'pre-line' }}>
+          <p style={{ fontFamily: 'Inter', fontSize: 12, color: 'var(--c-primary)', lineHeight: 1.5, marginBottom: 6, whiteSpace: 'pre-line' }}>
             {displayText}
           </p>
         )}
 
-        {/* If API returns no text body, show a prominent link to the full DWD warning */}
         {!hasText && alert.url && (
           <a
             href={alert.url}
@@ -89,7 +86,7 @@ function AlertItem({ alert, isDark }: { alert: WeatherAlert; isDark: boolean }) 
         )}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <p style={{ fontFamily: 'Inter', fontSize: 11, color: textMuted, fontVariantNumeric: 'tabular-nums' }}>
+          <p style={{ fontFamily: 'Inter', fontSize: 11, color: 'var(--c-muted)', fontVariantNumeric: 'tabular-nums' }}>
             {formatDt(alert.onset)} – {formatDt(alert.expires)} Uhr
           </p>
           {hasText && alert.url && (
@@ -115,12 +112,12 @@ interface Props {
   isDark?: boolean;
 }
 
-export default function AlertBanner({ alerts, isDark = false }: Props) {
+export default function AlertBanner({ alerts }: Props) {
   if (alerts.length === 0) return null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {alerts.map(alert => (
-        <AlertItem key={alert.id} alert={alert} isDark={isDark} />
+        <AlertItem key={alert.id} alert={alert} />
       ))}
     </div>
   );

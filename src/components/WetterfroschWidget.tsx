@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import frosch1 from '../assets/frog/frosch_01_sonnig.png';
-import frosch2 from '../assets/frog/frosch_02_neutral.png';
-import frosch3 from '../assets/frog/frosch_03_bewoelkt.png';
-import frosch4 from '../assets/frog/frosch_04_regen.png';
-import frosch5 from '../assets/frog/frosch_05_schnee.png';
+import frosch1 from '../assets/frog/frosch_01_sonnig.webp';
+import frosch2 from '../assets/frog/frosch_02_neutral.webp';
+import frosch3 from '../assets/frog/frosch_03_bewoelkt.webp';
+import frosch4 from '../assets/frog/frosch_04_regen.webp';
+import frosch5 from '../assets/frog/frosch_05_schnee.webp';
 
 interface WetterfroschWidgetProps {
   code: number;
@@ -36,11 +36,11 @@ const LABELS: Record<Condition, string> = {
   snow:    'Schnee',
 };
 
-export default function WetterfroschWidget({ code, isDark = false }: WetterfroschWidgetProps) {
+export default function WetterfroschWidget({ code }: WetterfroschWidgetProps) {
   const condition = getCondition(code);
   const [tapping, setTapping] = useState(false);
 
-  function handleTap() {
+  function handleActivate() {
     if (tapping) return;
     setTapping(true);
     setTimeout(() => setTapping(false), 700);
@@ -48,7 +48,11 @@ export default function WetterfroschWidget({ code, isDark = false }: Wetterfrosc
 
   return (
     <div
-      onClick={handleTap}
+      role="button"
+      tabIndex={0}
+      onClick={handleActivate}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleActivate(); } }}
+      aria-label={`Wetterfrosch: ${LABELS[condition]}`}
       style={{
         position: 'relative',
         overflow: 'hidden',
@@ -56,8 +60,8 @@ export default function WetterfroschWidget({ code, isDark = false }: Wetterfrosc
         cursor: 'pointer',
         WebkitTapHighlightColor: 'transparent',
         height: '100%',
-        background: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.5)',
-        border: isDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.6)',
+        background: 'var(--glass-bg)',
+        border: '1px solid var(--glass-b)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         display: 'flex',
@@ -89,7 +93,7 @@ export default function WetterfroschWidget({ code, isDark = false }: Wetterfrosc
         fontFamily: 'Inter',
         fontSize: 12,
         fontWeight: 500,
-        color: isDark ? 'rgba(255,255,255,0.55)' : '#717783',
+        color: 'var(--c-muted)',
       }}>
         {LABELS[condition]}
       </span>

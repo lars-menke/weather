@@ -4,6 +4,18 @@ Alle relevanten Änderungen an der App, gegliedert nach Version.
 
 ---
 
+## v2.2 — 12. Juni 2026
+
+- CSS-Design-Token-System: Farben via CSS Custom Properties (`--c-primary`, `--c-muted`, etc.), kein isDark-Ternär mehr in Komponenten
+- Frosch-Kachel barrierefreiheits-konform: `role="button"`, `tabIndex`, Tastaturnavigation
+- Pull-to-Refresh: nach unten ziehen lädt Wetterdaten neu
+- Sonne im Tagesverlauf anklicken zeigt aktuelle Uhrzeit als Tooltip
+- Temperatur-Sparkline über der stündlichen Vorhersage
+- Frosch-Bilder auf WebP umgestellt (~40% kleinere Dateigröße)
+- Frosch im Splash-Screen größer (300px) und mit Drop-Shadow
+- App auf max. 430px Breite begrenzt, zentriert auf Desktop
+- Touch-Targets auf mindestens 44px angehoben (iOS HIG)
+
 ## v2.1 — 4. Juni 2026
 
 - Zuletzt-aktualisiert-Zeitstempel im Dashboard-Hero

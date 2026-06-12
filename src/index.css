@@ -1,5 +1,39 @@
 @import "tailwindcss";
 
+:root {
+  --c-primary: #0b1c30;
+  --c-muted: #717783;
+  --c-muted-2: #a0aab4;
+  --c-accent: #0060ac;
+  --c-divider: rgba(0,0,0,0.06);
+  --c-fill: rgba(0,0,0,0.07);
+  --c-bar: #0060ac;
+  --c-bar-trk: rgba(0,0,0,0.08);
+  --c-chevron: rgba(0,96,172,0.4);
+  --glass-bg: rgba(255,255,255,0.5);
+  --glass-b: rgba(255,255,255,0.6);
+  --tabbar-bg: rgba(248,249,255,0.92);
+  --tabbar-b: rgba(0,0,0,0.08);
+  --dialog-bg: rgba(212,227,255,0.97);
+}
+
+[data-dark="true"] {
+  --c-primary: rgba(255,255,255,0.95);
+  --c-muted: rgba(255,255,255,0.6);
+  --c-muted-2: rgba(255,255,255,0.45);
+  --c-accent: #ffffff;
+  --c-divider: rgba(255,255,255,0.1);
+  --c-fill: rgba(255,255,255,0.12);
+  --c-bar: rgba(255,255,255,0.75);
+  --c-bar-trk: rgba(255,255,255,0.12);
+  --c-chevron: rgba(255,255,255,0.3);
+  --glass-bg: rgba(255,255,255,0.14);
+  --glass-b: rgba(255,255,255,0.18);
+  --tabbar-bg: rgba(15,25,50,0.92);
+  --tabbar-b: rgba(255,255,255,0.1);
+  --dialog-bg: rgba(11,28,48,0.97);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -23,12 +57,15 @@ body {
   overscroll-behavior-y: contain;
   /* bottom safe area for home indicator */
   padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  justify-content: center;
 }
 
 #root {
   min-height: 100vh;
   min-height: 100dvh;
-  max-width: 100vw;
+  width: 100%;
+  max-width: 430px;
   overflow-x: hidden;
 }
 

@@ -11,7 +11,7 @@ interface Props {
   onExpand: () => void;
 }
 
-export default function RadarTile({ lat, lon, isDark = false, onExpand }: Props) {
+export default function RadarTile({ lat, lon, onExpand }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layersRef = useRef<L.TileLayer[]>([]);
@@ -91,7 +91,7 @@ export default function RadarTile({ lat, lon, isDark = false, onExpand }: Props)
         <button
           onClick={onExpand}
           aria-label="Radar vergrößern"
-          style={{ pointerEvents: 'auto', background: badgeBg, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: 'none', borderRadius: 12, width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ pointerEvents: 'auto', background: badgeBg, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: 'none', borderRadius: 12, width: 44, height: 44, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 17, color: '#fff' }}>open_in_full</span>
         </button>
@@ -102,7 +102,7 @@ export default function RadarTile({ lat, lon, isDark = false, onExpand }: Props)
         <button
           onClick={() => setPlaying(p => !p)}
           aria-label={playing ? 'Pause' : 'Abspielen'}
-          style={{ position: 'absolute', bottom: 10, right: 12, zIndex: 1000, background: badgeBg, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: 'none', borderRadius: 20, width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ position: 'absolute', bottom: 10, right: 12, zIndex: 1000, background: badgeBg, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: 'none', borderRadius: 20, width: 44, height: 44, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#fff' }}>{playing ? 'pause' : 'play_arrow'}</span>
         </button>
@@ -110,8 +110,8 @@ export default function RadarTile({ lat, lon, isDark = false, onExpand }: Props)
 
       {/* Loading / error */}
       {status !== 'ready' && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: isDark ? 'rgba(11,28,48,0.35)' : 'rgba(255,255,255,0.3)' }}>
-          <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.8)' : '#0b1c30' }}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--glass-bg)' }}>
+          <span style={{ fontFamily: 'Inter', fontSize: 13, color: 'var(--c-primary)' }}>
             {status === 'loading' ? 'Wird geladen…' : 'Keine Radardaten'}
           </span>
         </div>

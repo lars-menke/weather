@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { getWeatherInfo } from '../components/WeatherIcon';
 import { getMatIcon } from '../lib/weatherCodes';
 import { makeGlass } from '../lib/glassStyle';
@@ -33,13 +34,13 @@ function utcMsToLocalHHMM(utcMs: number, utcOffsetSeconds: number): string {
 }
 
 function SectionHeader({
-  icon, children, badge, isDark,
+  icon, children, badge,
 }: {
-  icon: string; children: React.ReactNode; badge?: number; isDark: boolean;
+  icon: string; children: React.ReactNode; badge?: number;
 }) {
   const active = (badge ?? 0) > 0;
-  const iconColor = active ? '#ef4444' : (isDark ? 'rgba(255,255,255,0.45)' : '#a0aab4');
-  const textColor = active ? '#ef4444' : (isDark ? 'rgba(255,255,255,0.6)'  : '#717783');
+  const iconColor = active ? '#ef4444' : 'var(--c-muted-2)';
+  const textColor = active ? '#ef4444' : 'var(--c-muted)';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, paddingLeft: 2 }}>
       <span className="material-symbols-outlined" style={{ fontSize: 16, color: iconColor }}>{icon}</span>
@@ -58,11 +59,43 @@ function SectionHeader({
   );
 }
 
+function TempSparkline({ temps }: { temps: number[] }) {
+  if (temps.length < 2) return null;
+  const min = Math.min(...temps);
+  const max = Math.max(...temps);
+  const range = max - min || 1;
+  const W = 300, H = 36, padX = 8, padY = 6;
+  const pts = temps.map((t, i) => {
+    const x = padX + (i / (temps.length - 1)) * (W - padX * 2);
+    const y = H - padY - ((t - min) / range) * (H - padY * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      style={{ width: '100%', height: H, display: 'block', marginBottom: 2 }}
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <polyline
+        points={pts}
+        fill="none"
+        style={{ stroke: 'var(--c-bar)', strokeOpacity: 0.4 } as React.CSSProperties}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function SunArc({
   sunriseIso, sunsetIso, utcOffsetSeconds, isDark, uvIndex = 0,
 }: {
   sunriseIso: string; sunsetIso: string; utcOffsetSeconds: number; isDark: boolean; uvIndex?: number;
 }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+
   const toUtcMs = (iso: string) => new Date(iso + 'Z').getTime() - utcOffsetSeconds * 1000;
   const sunriseMs = toUtcMs(sunriseIso);
   const sunsetMs  = toUtcMs(sunsetIso);
@@ -80,15 +113,13 @@ function SunArc({
 
   const goldenMornEnd   = utcMsToLocalHHMM(sunriseMs + 3600000, utcOffsetSeconds);
   const goldenEvenStart = utcMsToLocalHHMM(sunsetMs  - 3600000, utcOffsetSeconds);
-
-  const labelColor  = isDark ? 'rgba(255,255,255,0.6)' : '#717783';
-  const primaryColor = isDark ? 'rgba(255,255,255,0.9)' : '#0b1c30';
+  const nowTimeStr      = utcMsToLocalHHMM(nowMs, utcOffsetSeconds);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
         <div>
-          <p style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 600, color: primaryColor, fontVariantNumeric: 'tabular-nums' }}>
+          <p style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 600, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>
             {formatLocalTime(sunriseIso)}
           </p>
           <p style={{ fontFamily: 'Inter', fontSize: 10, color: '#f59e0b', marginTop: 1 }}>
@@ -96,7 +127,7 @@ function SunArc({
           </p>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <p style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 600, color: primaryColor, fontVariantNumeric: 'tabular-nums' }}>
+          <p style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 600, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>
             {formatLocalTime(sunsetIso)}
           </p>
           <p style={{ fontFamily: 'Inter', fontSize: 10, color: '#f97316', marginTop: 1 }}>
@@ -106,9 +137,16 @@ function SunArc({
       </div>
 
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 60 }}>
-        <svg viewBox="0 0 200 108" style={{ width: '100%', height: 'auto', overflow: 'visible' }} aria-hidden="true">
+        <svg
+          viewBox="0 0 200 108"
+          style={{ width: '100%', height: 'auto', overflow: 'visible' }}
+          role="img"
+          aria-labelledby="sun-arc-title"
+        >
+          <title id="sun-arc-title">
+            Sonnenverlauf: Aufgang {formatLocalTime(sunriseIso)}, Untergang {formatLocalTime(sunsetIso)}
+          </title>
           <line x1="10" y1="100" x2="190" y2="100" stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'} strokeWidth="1" />
-          {/* Background arc — draws in */}
           <path
             d="M 10,100 A 90,90 0 0 1 190,100"
             fill="none"
@@ -118,7 +156,6 @@ function SunArc({
             strokeDasharray="283"
             style={{ animation: 'arc-draw 0.5s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both' }}
           />
-          {/* Progress arc — fades in after draw */}
           {isAboveHorizon && (
             <path
               d={`M 10,100 A 90,90 0 0 1 ${sunX},${sunY}`}
@@ -127,23 +164,49 @@ function SunArc({
               opacity="0.6"
             />
           )}
-          {/* Sun dot — pops in last */}
           <circle
-            cx={sunX} cy={sunY} r="8"
+            cx={sunX} cy={sunY} r="9"
             fill={isAboveHorizon ? '#f59e0b' : 'rgba(245,158,11,0.3)'}
-            style={{ animation: 'sun-dot-pop 0.3s 0.45s cubic-bezier(0.16, 1, 0.3, 1) both', transformOrigin: `${sunX}px ${sunY}px` }}
+            style={{
+              cursor: isAboveHorizon ? 'pointer' : 'default',
+              animation: 'sun-dot-pop 0.3s 0.45s cubic-bezier(0.16, 1, 0.3, 1) both',
+              transformOrigin: `${sunX}px ${sunY}px`,
+            }}
+            onClick={isAboveHorizon ? () => setShowTooltip(s => !s) : undefined}
+            role={isAboveHorizon ? 'button' : undefined}
+            aria-label={isAboveHorizon ? `Aktuelle Zeit: ${nowTimeStr} Uhr` : undefined}
+            tabIndex={isAboveHorizon ? 0 : undefined}
           />
+          {showTooltip && isAboveHorizon && (
+            <g>
+              <rect
+                x={Math.max(2, sunX - 32)} y={sunY - 32}
+                width={64} height={22} rx={5}
+                fill="rgba(15,25,50,0.85)"
+              />
+              <text
+                x={Math.min(196, Math.max(34, sunX))}
+                y={sunY - 16}
+                textAnchor="middle"
+                fill="#fff"
+                fontSize="10"
+                fontFamily="Inter"
+              >
+                {nowTimeStr} Uhr
+              </text>
+            </g>
+          )}
         </svg>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-        <p style={{ fontFamily: 'Inter', fontSize: 11, color: labelColor, fontVariantNumeric: 'tabular-nums' }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 11, color: 'var(--c-muted)', fontVariantNumeric: 'tabular-nums' }}>
           {h}h {m}min Tageslicht
         </p>
         {uvIndex > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 13, color: '#f59e0b' }}>wb_sunny</span>
-            <p style={{ fontFamily: 'Inter', fontSize: 11, color: labelColor, fontVariantNumeric: 'tabular-nums' }}>UV {uvIndex}</p>
+            <p style={{ fontFamily: 'Inter', fontSize: 11, color: 'var(--c-muted)', fontVariantNumeric: 'tabular-nums' }}>UV {uvIndex}</p>
           </div>
         )}
       </div>
@@ -169,6 +232,7 @@ export default function Dashboard({
   if (currentHourIndex < 0) currentHourIndex = 0;
 
   const hourlySlice = hourly.time.slice(currentHourIndex, currentHourIndex + 24);
+  const sparklineTemps = hourlySlice.map((_, idx) => Math.round(hourly.temperature_2m[currentHourIndex + idx]));
 
   const todayMax   = Math.round(daily.temperature_2m_max[0]);
   const todayMin   = Math.round(daily.temperature_2m_min[0]);
@@ -177,18 +241,14 @@ export default function Dashboard({
   const windSuffix  = windUnit === 'mph' ? 'mph' : 'km/h';
   const currentUvIndex = Math.round(hourly.uv_index[currentHourIndex] ?? 0);
 
-  const c = isDark
-    ? { primary: 'rgba(255,255,255,0.95)', muted: 'rgba(255,255,255,0.6)', accent: '#fff', divider: 'rgba(255,255,255,0.2)' }
-    : { primary: '#0b1c30',               muted: '#717783',                accent: '#0060ac', divider: 'rgba(0,0,0,0.12)' };
-
-  const glassCard = makeGlass(isDark);
+  const glassCard = makeGlass();
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
       {/* Hero */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, paddingTop: 8 }}>
-        <p style={{ fontFamily: 'Inter', fontSize: 15, color: c.muted, fontWeight: 500 }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 15, color: 'var(--c-muted)', fontWeight: 500 }}>
           {cityName}{country ? `, ${country}` : ''}
         </p>
 
@@ -198,30 +258,30 @@ export default function Dashboard({
         >{currentIcon}</span>
 
         <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 4, lineHeight: 1 }}>
-          <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 112, letterSpacing: '-0.04em', color: c.accent, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 112, letterSpacing: '-0.04em', color: 'var(--c-accent)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
             {Math.round(current.temperature_2m)}
           </span>
-          <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 44, color: c.accent, marginTop: 12 }}>
+          <span style={{ fontFamily: 'Outfit', fontWeight: 300, fontSize: 44, color: 'var(--c-accent)', marginTop: 12 }}>
             {tempSuffix}
           </span>
         </div>
 
-        <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: c.primary, marginTop: 4 }}>
+        <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: 'var(--c-primary)', marginTop: 4 }}>
           {info.description}
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 14, color: c.muted, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 14, color: 'var(--c-muted)', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
           Gefühlt {Math.round(current.apparent_temperature)}{tempSuffix}
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 13, color: c.muted, marginTop: 2 }}>{dateStr}</p>
+        <p style={{ fontFamily: 'Inter', fontSize: 13, color: 'var(--c-muted)', marginTop: 2 }}>{dateStr}</p>
 
         {lastUpdated && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 3 }}>
             <span
               key={lastUpdated.getTime()}
               className="material-symbols-outlined sync-spin"
-              style={{ fontSize: 12, color: c.muted, opacity: 0.65 }}
+              style={{ fontSize: 12, color: 'var(--c-muted)', opacity: 0.65 }}
             >sync</span>
-            <p style={{ fontFamily: 'Inter', fontSize: 11, color: c.muted, opacity: 0.65, fontVariantNumeric: 'tabular-nums' }}>
+            <p style={{ fontFamily: 'Inter', fontSize: 11, color: 'var(--c-muted)', opacity: 0.65, fontVariantNumeric: 'tabular-nums' }}>
               {lastUpdated.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr
             </p>
           </div>
@@ -229,15 +289,15 @@ export default function Dashboard({
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18, color: c.accent }}>air</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--c-accent)' }}>air</span>
+            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>
               {Math.round(current.windspeed_10m)} {windSuffix}
             </span>
           </div>
-          <div style={{ width: 1, height: 28, background: c.divider }} />
+          <div style={{ width: 1, height: 28, background: 'var(--c-divider)' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18, color: c.accent }}>humidity_percentage</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--c-accent)' }}>humidity_percentage</span>
+            <span style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>
               {current.relativehumidity_2m}%
             </span>
           </div>
@@ -249,14 +309,13 @@ export default function Dashboard({
         <SectionHeader
           icon={alerts.length > 0 ? 'warning' : 'notifications'}
           badge={alerts.length || undefined}
-          isDark={isDark}
         >
           Warnungen
         </SectionHeader>
         {alerts.length === 0 ? (
           <div style={{ ...glassCard, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color: '#10b981', flexShrink: 0 }}>check_circle</span>
-            <p style={{ fontFamily: 'Inter', fontSize: 14, color: c.muted }}>Keine aktiven Warnungen</p>
+            <p style={{ fontFamily: 'Inter', fontSize: 14, color: 'var(--c-muted)' }}>Keine aktiven Warnungen</p>
           </div>
         ) : (
           <AlertBanner alerts={alerts} isDark={isDark} />
@@ -265,8 +324,9 @@ export default function Dashboard({
 
       {/* Stündlich */}
       <div>
-        <SectionHeader icon="schedule" isDark={isDark}>Stündlich</SectionHeader>
-        <div style={{ ...glassCard, padding: '12px 8px' }}>
+        <SectionHeader icon="schedule">Stündlich</SectionHeader>
+        <div style={{ ...glassCard, padding: '8px 8px 12px' }}>
+          <TempSparkline temps={sparklineTemps} />
           <div className="hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', gap: 4 }}>
             {hourlySlice.map((timeStr, idx) => {
               const absIdx = currentHourIndex + idx;
@@ -286,9 +346,9 @@ export default function Dashboard({
                     ? (isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,96,172,0.09)')
                     : 'transparent',
                 }}>
-                  <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: isNow ? 700 : 400, color: isNow ? c.accent : c.muted }}>{label}</span>
+                  <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: isNow ? 700 : 400, color: isNow ? 'var(--c-accent)' : 'var(--c-muted)' }}>{label}</span>
                   <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color }}>{icon}</span>
-                  <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
+                  <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
                   {precipMm > 0.05 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                       <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>{precipMm.toFixed(1)}mm</span>
@@ -314,24 +374,24 @@ export default function Dashboard({
 
         <div style={{ ...glassCard, padding: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18, color: c.accent }}>device_thermostat</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: c.muted }}>Max / Min</span>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--c-accent)' }}>device_thermostat</span>
+            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--c-muted)' }}>Max / Min</span>
           </div>
-          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>
+          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>
             {todayMax}° / {todayMin}°
           </p>
-          <p style={{ fontFamily: 'Inter', fontSize: 12, color: c.muted, marginTop: 4 }}>Heute</p>
+          <p style={{ fontFamily: 'Inter', fontSize: 12, color: 'var(--c-muted)', marginTop: 4 }}>Heute</p>
         </div>
 
         <div style={{ ...glassCard, padding: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18, color: c.accent }}>water_drop</span>
-            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: c.muted }}>Niederschlag</span>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--c-accent)' }}>water_drop</span>
+            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--c-muted)' }}>Niederschlag</span>
           </div>
-          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: c.primary, fontVariantNumeric: 'tabular-nums' }}>
+          <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>
             {todayPrecip.toFixed(1)} mm
           </p>
-          <p style={{ fontFamily: 'Inter', fontSize: 12, color: c.muted, marginTop: 4 }}>Heute gesamt</p>
+          <p style={{ fontFamily: 'Inter', fontSize: 12, color: 'var(--c-muted)', marginTop: 4 }}>Heute gesamt</p>
         </div>
 
         <div className="animate-frog-in" style={{ height: '100%' }}>
@@ -354,7 +414,7 @@ export default function Dashboard({
 
       {/* Radar */}
       <div>
-        <SectionHeader icon="radar" isDark={isDark}>Radar</SectionHeader>
+        <SectionHeader icon="radar">Radar</SectionHeader>
         <RadarTile lat={lat} lon={lon} isDark={isDark} onExpand={onNavigateToRadar} />
       </div>
 

@@ -46,41 +46,41 @@ function SegmentToggle<T extends string>({
   );
 }
 
-function Row({ icon, iconColor, label, children, divider = true, isDark = false }: {
+function Row({ icon, iconColor, label, children, divider = true }: {
   icon: string; iconColor: string; label: string; children: React.ReactNode; divider?: boolean; isDark?: boolean;
 }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
-      borderBottom: divider ? `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}` : undefined,
+      borderBottom: divider ? `1px solid var(--c-divider)` : undefined,
     }}>
       <span className="material-symbols-outlined" style={{ fontSize: 20, color: iconColor, flexShrink: 0 }}>{icon}</span>
-      <span style={{ fontFamily: 'Inter', fontSize: 15, color: isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30', flex: 1 }}>{label}</span>
+      <span style={{ fontFamily: 'Inter', fontSize: 15, color: 'var(--c-primary)', flex: 1 }}>{label}</span>
       {children}
     </div>
   );
 }
 
-function InfoRow({ icon, iconColor, label, value, divider = true, isDark = false }: {
+function InfoRow({ icon, iconColor, label, value, divider = true }: {
   icon: string; iconColor: string; label: string; value: string; divider?: boolean; isDark?: boolean;
 }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
-      borderBottom: divider ? `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}` : undefined,
+      borderBottom: divider ? `1px solid var(--c-divider)` : undefined,
     }}>
       <span className="material-symbols-outlined" style={{ fontSize: 20, color: iconColor, flexShrink: 0 }}>{icon}</span>
       <div style={{ flex: 1 }}>
-        <div style={{ fontFamily: 'Inter', fontSize: 15, color: isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30' }}>{label}</div>
-        <div style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.6)' : '#717783', marginTop: 2 }}>{value}</div>
+        <div style={{ fontFamily: 'Inter', fontSize: 15, color: 'var(--c-primary)' }}>{label}</div>
+        <div style={{ fontFamily: 'Inter', fontSize: 13, color: 'var(--c-muted)', marginTop: 2 }}>{value}</div>
       </div>
     </div>
   );
 }
 
-function SectionLabel({ children, isDark }: { children: React.ReactNode; isDark?: boolean }) {
+function SectionLabel({ children }: { children: React.ReactNode; isDark?: boolean }) {
   return (
-    <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: isDark ? 'rgba(255,255,255,0.6)' : '#717783', marginBottom: 8, paddingLeft: 4 }}>
+    <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--c-muted)', marginBottom: 8, paddingLeft: 4 }}>
       {children}
     </p>
   );
@@ -89,22 +89,22 @@ function SectionLabel({ children, isDark }: { children: React.ReactNode; isDark?
 export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindUnit, isDark = false }: Props) {
   const [expandedVersion, setExpandedVersion] = useState<string | null>(CHANGELOG[0].version);
 
-  const glassCard = { ...makeGlass(isDark), overflow: 'hidden' as const };
+  const glassCard = { ...makeGlass(), overflow: 'hidden' as const };
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 8 }}>
 
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <p style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30', letterSpacing: '-0.02em' }}>
+        <p style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 700, color: 'var(--c-primary)', letterSpacing: '-0.02em' }}>
           Einstellungen
         </p>
-        <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.45)' : '#a0aab4', fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontFamily: 'Inter', fontSize: 13, color: 'var(--c-muted-2)', fontVariantNumeric: 'tabular-nums' }}>
           v{APP_VERSION}
         </span>
       </div>
 
       <section>
-        <SectionLabel isDark={isDark}>Einheiten</SectionLabel>
+        <SectionLabel>Einheiten</SectionLabel>
         <div style={glassCard}>
           <Row icon="device_thermostat" iconColor="#0060ac" label="Temperatur" isDark={isDark}>
             <SegmentToggle
@@ -130,24 +130,24 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
       </section>
 
       <section>
-        <SectionLabel isDark={isDark}>Datenquellen</SectionLabel>
+        <SectionLabel>Datenquellen</SectionLabel>
         <div style={glassCard}>
-          <InfoRow icon="cloud" iconColor="#0060ac" label="Wetterdaten" value="Open-Meteo (open-meteo.com)" isDark={isDark} />
-          <InfoRow icon="radar" iconColor="#6366f1" label="Radardaten" value="RainViewer (rainviewer.com)" isDark={isDark} />
-          <InfoRow icon="map" iconColor="#10b981" label="Karten" value="OpenStreetMap contributors" divider={false} isDark={isDark} />
+          <InfoRow icon="cloud" iconColor="#0060ac" label="Wetterdaten" value="Open-Meteo (open-meteo.com)" />
+          <InfoRow icon="radar" iconColor="#6366f1" label="Radardaten" value="RainViewer (rainviewer.com)" />
+          <InfoRow icon="map" iconColor="#10b981" label="Karten" value="OpenStreetMap contributors" divider={false} />
         </div>
       </section>
 
       {/* Aktuelle Version */}
       <section>
-        <SectionLabel isDark={isDark}>Was ist neu? · v{APP_VERSION}</SectionLabel>
+        <SectionLabel>Was ist neu? · v{APP_VERSION}</SectionLabel>
         <div style={{ ...glassCard, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {CHANGELOG[0].items.map((item, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
               <span className="material-symbols-outlined mat-fill" style={{ fontSize: 16, color: '#6366f1', flexShrink: 0, marginTop: 1 }}>
                 {item.icon}
               </span>
-              <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.8)' : '#3a4452', lineHeight: 1.4 }}>
+              <span style={{ fontFamily: 'Inter', fontSize: 13, color: 'var(--c-primary)', lineHeight: 1.4 }}>
                 {item.text}
               </span>
             </div>
@@ -155,9 +155,9 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
         </div>
       </section>
 
-      {/* Ältere Versionen — ein einziger aufklappbarer Block */}
+      {/* Ältere Versionen */}
       <section>
-        <SectionLabel isDark={isDark}>Ältere Versionen</SectionLabel>
+        <SectionLabel>Ältere Versionen</SectionLabel>
         <div style={{ ...glassCard, overflow: 'hidden' }}>
           <button
             onClick={() => setExpandedVersion(expandedVersion === 'older' ? null : 'older')}
@@ -169,15 +169,15 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
             }}
           >
             <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 600, color: isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30' }}>
+              <div style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 600, color: 'var(--c-primary)' }}>
                 Kompletter Changelog
               </div>
-              <div style={{ fontFamily: 'Inter', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.45)' : '#a0aab4', marginTop: 1 }}>
+              <div style={{ fontFamily: 'Inter', fontSize: 12, color: 'var(--c-muted-2)', marginTop: 1 }}>
                 v{CHANGELOG[CHANGELOG.length - 1].version} – v{CHANGELOG[0].version}
               </div>
             </div>
             <span className="material-symbols-outlined" style={{
-              fontSize: 18, color: isDark ? 'rgba(255,255,255,0.3)' : '#c0c8d0',
+              fontSize: 18, color: 'var(--c-muted-2)',
               transform: expandedVersion === 'older' ? 'rotate(180deg)' : 'rotate(0deg)',
               transition: 'transform 0.2s ease', flexShrink: 0,
             }}>expand_more</span>
@@ -189,19 +189,19 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
                 <div key={entry.version}>
                   <div style={{
                     height: 1,
-                    background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                    background: 'var(--c-divider)',
                     marginBottom: 12,
                   }} />
-                  <div style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.4)' : '#a0aab4', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <div style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 700, color: 'var(--c-muted-2)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     Version {entry.version} · {entry.date}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: ei < CHANGELOG.length - 1 ? 16 : 0 }}>
                     {entry.items.map((item, i) => (
                       <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                        <span className="material-symbols-outlined mat-fill" style={{ fontSize: 16, color: isDark ? 'rgba(255,255,255,0.25)' : '#c0c8d0', flexShrink: 0, marginTop: 1 }}>
+                        <span className="material-symbols-outlined mat-fill" style={{ fontSize: 16, color: 'var(--c-muted-2)', flexShrink: 0, marginTop: 1 }}>
                           {item.icon}
                         </span>
-                        <span style={{ fontFamily: 'Inter', fontSize: 13, color: isDark ? 'rgba(255,255,255,0.55)' : '#717783', lineHeight: 1.4 }}>
+                        <span style={{ fontFamily: 'Inter', fontSize: 13, color: 'var(--c-muted)', lineHeight: 1.4 }}>
                           {item.text}
                         </span>
                       </div>

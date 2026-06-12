@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { DailyWeatherData, HourlyWeatherData, TempUnit, WindUnit } from '../types/weather';
 import { getWeatherInfo } from '../components/WeatherIcon';
 import { getMatIcon } from '../lib/weatherCodes';
+import { makeGlass } from '../lib/glassStyle';
 
 const DAYS_DE: Record<string, string> = {
   Monday: 'Montag', Tuesday: 'Dienstag', Wednesday: 'Mittwoch',
@@ -43,7 +44,6 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
   const hourCount = Math.min(24, hourly.time.length - startIdx);
   const indices = Array.from({ length: hourCount }, (_, h) => startIdx + h);
 
-  // Current-hour index within this day's 24 slots (only relevant for today)
   const nowRef = useRef<HTMLDivElement>(null);
   const currentHourInDay = (() => {
     if (dayIndex !== 0) return -1;
@@ -75,13 +75,7 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
     Math.min(24, indices.reduce((s, i) => s + (hourly.visibility[i] ?? 0) / 1000, 0) / hourCount)
   );
 
-  const glassCard: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.5)',
-    borderRadius: 16,
-    border: '1px solid rgba(255,255,255,0.6)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-  };
+  const glassCard = makeGlass();
 
   return (
     <div
@@ -90,7 +84,7 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
       aria-label={`${dayLabel} Detailansicht`}
       style={{
         position: 'fixed', inset: 0, zIndex: 200,
-        background: 'rgba(212,227,255,0.97)',
+        background: 'var(--dialog-bg)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         overflowY: 'auto',
@@ -107,9 +101,9 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
         <button
           onClick={onClose}
           aria-label="Schließen"
-          style={{ width: 32, height: 32, borderRadius: 16, background: 'rgba(0,0,0,0.07)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+          style={{ width: 44, height: 44, borderRadius: 22, background: 'rgba(0,0,0,0.07)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#717783' }}>close</span>
+          <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--c-muted)' }}>close</span>
         </button>
       </div>
 
@@ -118,18 +112,18 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
         {/* Header */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, paddingTop: 8 }}>
           <span className={`material-symbols-outlined mat-fill${icon === 'sunny' ? ' sun-animate' : ''}`} style={{ fontSize: 60, color }}>{icon}</span>
-          <p style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 700, color: '#0b1c30', letterSpacing: '-0.02em', marginTop: 4 }}>{dayLabel}</p>
-          <p style={{ fontFamily: 'Inter', fontSize: 14, color: '#717783' }}>{fullDate}</p>
-          <p style={{ fontFamily: 'Outfit', fontSize: 18, fontWeight: 500, color: '#0b1c30', marginTop: 4 }}>{info.description}</p>
-          <p style={{ fontFamily: 'Inter', fontSize: 15, color: '#717783', marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
-            <span style={{ color: '#0060ac', fontWeight: 600 }}>{max}{tempSuffix}</span>
+          <p style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 700, color: 'var(--c-primary)', letterSpacing: '-0.02em', marginTop: 4 }}>{dayLabel}</p>
+          <p style={{ fontFamily: 'Inter', fontSize: 14, color: 'var(--c-muted)' }}>{fullDate}</p>
+          <p style={{ fontFamily: 'Outfit', fontSize: 18, fontWeight: 500, color: 'var(--c-primary)', marginTop: 4 }}>{info.description}</p>
+          <p style={{ fontFamily: 'Inter', fontSize: 15, color: 'var(--c-muted)', marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ color: 'var(--c-accent)', fontWeight: 600 }}>{max}{tempSuffix}</span>
             {' / '}{min}{tempSuffix}
           </p>
         </div>
 
         {/* Hourly strip */}
         <div>
-          <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#717783', marginBottom: 8, paddingLeft: 4 }}>
+          <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--c-muted)', marginBottom: 8, paddingLeft: 4 }}>
             Stündlich
           </p>
           <div style={{ ...glassCard, padding: '12px 8px' }}>
@@ -153,9 +147,9 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
                       background: isNow ? 'rgba(0,96,172,0.09)' : 'transparent',
                     }}
                   >
-                    <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: isNow ? 700 : 400, color: isNow ? '#0060ac' : '#717783' }}>{label}</span>
+                    <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: isNow ? 700 : 400, color: isNow ? 'var(--c-accent)' : 'var(--c-muted)' }}>{label}</span>
                     <span className="material-symbols-outlined mat-fill" style={{ fontSize: 20, color: hColor }}>{hIcon}</span>
-                    <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
+                    <span style={{ fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>{temp}°</span>
                     {precipMm > 0.05 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                         <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#3b82f6', fontVariantNumeric: 'tabular-nums' }}>
@@ -182,7 +176,7 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
 
         {/* Stats grid */}
         <div>
-          <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#717783', marginBottom: 8, paddingLeft: 4 }}>
+          <p style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--c-muted)', marginBottom: 8, paddingLeft: 4 }}>
             Details
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -190,48 +184,48 @@ export default function DayDetailScreen({ dayIndex, daily, hourly, timezone, tem
             <div style={{ ...glassCard, padding: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#f59e0b' }}>wb_sunny</span>
-                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>UV-Index</span>
+                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--c-muted)' }}>UV-Index</span>
               </div>
-              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{uvMax}</p>
-              <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>{uvLabel(uvMax)}</p>
+              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>{uvMax}</p>
+              <p style={{ fontFamily: 'Inter', fontSize: 12, color: 'var(--c-muted)', marginTop: 4 }}>{uvLabel(uvMax)}</p>
             </div>
 
             <div style={{ ...glassCard, padding: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0060ac' }}>air</span>
-                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>Wind max.</span>
+                <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--c-accent)' }}>air</span>
+                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--c-muted)' }}>Wind max.</span>
               </div>
-              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{windMax}</p>
-              <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>{windSuffix}</p>
+              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>{windMax}</p>
+              <p style={{ fontFamily: 'Inter', fontSize: 12, color: 'var(--c-muted)', marginTop: 4 }}>{windSuffix}</p>
             </div>
 
             <div style={{ ...glassCard, padding: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#6366f1' }}>speed</span>
-                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>Luftdruck</span>
+                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--c-muted)' }}>Luftdruck</span>
               </div>
-              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{pressureAvg}</p>
-              <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>hPa</p>
+              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>{pressureAvg}</p>
+              <p style={{ fontFamily: 'Inter', fontSize: 12, color: 'var(--c-muted)', marginTop: 4 }}>hPa</p>
             </div>
 
             <div style={{ ...glassCard, padding: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#10b981' }}>visibility</span>
-                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>Sichtweite</span>
+                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--c-muted)' }}>Sichtweite</span>
               </div>
-              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>{visibilityAvg}</p>
-              <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>km</p>
+              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>{visibilityAvg}</p>
+              <p style={{ fontFamily: 'Inter', fontSize: 12, color: 'var(--c-muted)', marginTop: 4 }}>km</p>
             </div>
 
             <div style={{ ...glassCard, padding: 16, gridColumn: '1 / -1' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                 <span className="material-symbols-outlined mat-fill" style={{ fontSize: 18, color: '#3b82f6' }}>water_drop</span>
-                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#717783' }}>Niederschlag</span>
+                <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--c-muted)' }}>Niederschlag</span>
               </div>
-              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: '#0b1c30', fontVariantNumeric: 'tabular-nums' }}>
+              <p style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 500, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>
                 {(daily.precipitation_sum[dayIndex] ?? 0).toFixed(1)} mm
               </p>
-              <p style={{ fontFamily: 'Inter', fontSize: 12, color: '#717783', marginTop: 4 }}>Tagessumme</p>
+              <p style={{ fontFamily: 'Inter', fontSize: 12, color: 'var(--c-muted)', marginTop: 4 }}>Tagessumme</p>
             </div>
 
           </div>

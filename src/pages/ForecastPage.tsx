@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { DailyWeatherData, HourlyWeatherData, TempUnit, WindUnit } from '../types/weather';
 import { getWeatherInfo } from '../components/WeatherIcon';
 import { getMatIcon } from '../lib/weatherCodes';
+import { makeGlass } from '../lib/glassStyle';
 import DayDetailScreen from './DayDetailScreen';
 
 interface ForecastPageProps {
@@ -28,26 +29,15 @@ function getDayLabel(dateStr: string, index: number, timezone: string): string {
   return DAYS_DE[eng] ?? eng;
 }
 
-export default function ForecastPage({ data, hourly, timezone, tempUnit, windUnit, isDark = false, cityName, country }: ForecastPageProps) {
+export default function ForecastPage({ data, hourly, timezone, tempUnit, windUnit, cityName, country }: ForecastPageProps) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   const globalMax = Math.max(...data.temperature_2m_max);
   const globalMin = Math.min(...data.temperature_2m_min);
   const range = globalMax - globalMin || 1;
 
-  const titleColor  = isDark ? 'rgba(255,255,255,0.95)' : '#0b1c30';
-  const mutedColor  = isDark ? 'rgba(255,255,255,0.55)' : '#717783';
-  const accentColor = isDark ? 'rgba(255,255,255,0.95)' : '#0060ac';
-  const barColor    = isDark ? 'rgba(255,255,255,0.75)' : '#0060ac';
-  const barTrack    = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
-  const chevron     = isDark ? 'rgba(255,255,255,0.3)'  : 'rgba(0,96,172,0.4)';
-
   const glassCard: React.CSSProperties = {
-    background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.5)',
-    borderRadius: 16,
-    border: isDark ? '1px solid rgba(255,255,255,0.16)' : '1px solid rgba(255,255,255,0.6)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
+    ...makeGlass(),
     padding: 16,
     marginBottom: 10,
     cursor: 'pointer',
@@ -57,13 +47,13 @@ export default function ForecastPage({ data, hourly, timezone, tempUnit, windUni
   return (
     <>
       <div className="animate-fade-in">
-        <p style={{ fontFamily: 'Outfit', fontSize: 20, fontWeight: 500, color: titleColor, padding: '0 0 4px 0' }}>
+        <p style={{ fontFamily: 'Outfit', fontSize: 20, fontWeight: 500, color: 'var(--c-primary)', padding: '0 0 4px 0' }}>
           7-Tage-Vorhersage
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: mutedColor, marginBottom: 4 }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 500, color: 'var(--c-muted)', marginBottom: 4 }}>
           {cityName}{country ? `, ${country}` : ''}
         </p>
-        <p style={{ fontFamily: 'Inter', fontSize: 13, color: mutedColor, marginBottom: 16, opacity: 0.7 }}>
+        <p style={{ fontFamily: 'Inter', fontSize: 13, color: 'var(--c-muted)', marginBottom: 16, opacity: 0.7 }}>
           Tippen für Details
         </p>
 
@@ -88,23 +78,23 @@ export default function ForecastPage({ data, hourly, timezone, tempUnit, windUni
             >
               {/* Row 1: day + icon + temps */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <span style={{ fontFamily: 'Outfit', fontSize: 17, fontWeight: 500, color: titleColor, flex: 1 }}>
+                <span style={{ fontFamily: 'Outfit', fontSize: 17, fontWeight: 500, color: 'var(--c-primary)', flex: 1 }}>
                   {dayLabel}
                 </span>
                 <span className="material-symbols-outlined mat-fill" style={{ fontSize: 22, color }}>
                   {icon}
                 </span>
-                <span style={{ fontFamily: 'Outfit', fontSize: 32, fontWeight: 300, color: accentColor, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ fontFamily: 'Outfit', fontSize: 32, fontWeight: 300, color: 'var(--c-accent)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                   {max}°
                 </span>
-                <span style={{ fontFamily: 'Inter', fontSize: 15, color: mutedColor, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ fontFamily: 'Inter', fontSize: 15, color: 'var(--c-muted)', fontVariantNumeric: 'tabular-nums' }}>
                   / {min}°
                 </span>
               </div>
 
               {/* Row 2: condition + precipitation */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                <span style={{ fontFamily: 'Inter', fontSize: 13, color: mutedColor, flex: 1 }}>
+                <span style={{ fontFamily: 'Inter', fontSize: 13, color: 'var(--c-muted)', flex: 1 }}>
                   {info.description}
                 </span>
                 {precip > 0 && (
@@ -117,24 +107,24 @@ export default function ForecastPage({ data, hourly, timezone, tempUnit, windUni
 
               {/* Temp bar */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontFamily: 'Inter', fontSize: 12, color: mutedColor, width: 28, textAlign: 'right', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ fontFamily: 'Inter', fontSize: 12, color: 'var(--c-muted)', width: 28, textAlign: 'right', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {min}°
                 </span>
-                <div style={{ flex: 1, height: 4, borderRadius: 9999, background: barTrack, position: 'relative' }}>
+                <div style={{ flex: 1, height: 4, borderRadius: 9999, background: 'var(--c-bar-trk)', position: 'relative' }}>
                   <div style={{
                     position: 'absolute', top: 0, height: '100%', borderRadius: 9999,
                     left: `${barLeft}%`, width: `${barWidth}%`,
-                    background: barColor,
+                    background: 'var(--c-bar)',
                   }} />
                 </div>
-                <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 600, color: titleColor, width: 28, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 600, color: 'var(--c-primary)', width: 28, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {max}°
                 </span>
               </div>
 
               {/* Tap hint */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 16, color: chevron }}>chevron_right</span>
+                <span className="material-symbols-outlined" style={{ fontSize: 16, color: 'var(--c-chevron)' }}>chevron_right</span>
               </div>
             </button>
           );
