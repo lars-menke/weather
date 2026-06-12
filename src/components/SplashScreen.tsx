@@ -56,7 +56,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         gap: 16,
       }}
     >
-      <div ref={containerRef}>
+      <div ref={containerRef} style={{ paddingBottom: 16 }}>
         <img
           src={logoImg}
           alt="FrogWeather Logo"
@@ -65,7 +65,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
             objectFit: 'contain',
             userSelect: 'none',
             display: 'block',
-            filter: 'drop-shadow(0px 10px 28px rgba(0,60,120,0.32)) drop-shadow(0px 2px 6px rgba(0,0,0,0.12))',
+            filter: 'drop-shadow(0px 6px 32px rgba(0,60,120,0.26)) drop-shadow(0px 1px 6px rgba(0,0,0,0.10))',
           }}
         />
       </div>
