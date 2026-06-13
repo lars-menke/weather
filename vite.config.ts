@@ -10,7 +10,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       base: '/weather/',
-      includeAssets: ['apple-touch-icon.png', 'favicon-32.png', 'icon-192.png', 'icon-512.png'],
+      includeAssets: ['apple-touch-icon-v2.png', 'favicon-32-v2.png', 'icon-192-v2.png', 'icon-512-v2.png'],
       manifest: {
         name: 'FrogWeather',
         short_name: 'FrogWeather',
@@ -23,12 +23,12 @@ export default defineConfig({
         theme_color: '#0060ac',
         icons: [
           {
-            src: '/weather/icon-192.png',
+            src: '/weather/icon-192-v2.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: '/weather/icon-512.png',
+            src: '/weather/icon-512-v2.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable',
