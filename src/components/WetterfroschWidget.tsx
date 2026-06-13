@@ -68,11 +68,14 @@ export default function WetterfroschWidget({ code }: WetterfroschWidgetProps) {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 8,
-        padding: '12px 8px 16px',
+        gap: 6,
+        padding: '8px 8px 12px',
       }}
     >
-      <div className={tapping ? 'frog-tap-hop' : ''}>
+      <div
+        className={tapping ? 'frog-tap-hop' : ''}
+        style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+      >
         <img
           key={condition}
           className="frog-condition-swap"
@@ -80,8 +83,9 @@ export default function WetterfroschWidget({ code }: WetterfroschWidgetProps) {
           alt=""
           aria-hidden="true"
           style={{
-            width: 96,
-            height: 96,
+            width: 'min(86%, 140px)',
+            aspectRatio: '1 / 1',
+            height: 'auto',
             objectFit: 'contain',
             display: 'block',
             userSelect: 'none',
