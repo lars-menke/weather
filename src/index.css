@@ -227,6 +227,29 @@ a:focus-visible {
   to   { opacity: 1; transform: scale(1); }
 }
 
+/* Splash — frog hops in from below with a springy landing */
+@keyframes splash-frog-hop {
+  0%   { opacity: 0; transform: translateY(54px) scale(0.45); }
+  55%  { opacity: 1; transform: translateY(-28px) scale(1.07); }
+  70%  { transform: translateY(10px) scale(0.96); }
+  84%  { transform: translateY(-7px) scale(1.02); }
+  100% { transform: translateY(0) scale(1); }
+}
+.splash-frog-hop { animation: splash-frog-hop 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
+
+/* Splash — gentle idle bob once the frog has landed */
+@keyframes splash-frog-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+.splash-frog-bob { animation: splash-frog-bob 2.6s ease-in-out 1s infinite; }
+
+/* Splash — text rises into place */
+@keyframes splash-text-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
