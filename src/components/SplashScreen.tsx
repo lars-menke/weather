@@ -1,49 +1,16 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import logoImg from '../assets/frog/frosch_00_logo.webp';
 
 export function SplashScreen({ onDone }: { onDone: () => void }) {
-  const onDoneRef    = useRef(onDone);
+  const onDoneRef = useRef(onDone);
   const [fading, setFading] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const titleRef     = useRef<HTMLParagraphElement>(null);
-  const subRef       = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => { onDoneRef.current = onDone; });
 
-  useLayoutEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.style.opacity = '0';
-      containerRef.current.style.transform = 'scale(0.72)';
-    }
-    if (titleRef.current) {
-      titleRef.current.style.opacity = '0';
-      titleRef.current.style.transform = 'translateY(10px)';
-    }
-    if (subRef.current) {
-      subRef.current.style.opacity = '0';
-      subRef.current.style.transform = 'translateY(10px)';
-    }
-  }, []);
-
   useEffect(() => {
-    function transitionIn(el: HTMLElement | null, css: string, finalTransform: string) {
-      if (!el) return;
-      el.offsetHeight;
-      el.style.transition = css;
-      el.style.opacity = '1';
-      el.style.transform = finalTransform;
-    }
-
-    const t1 = setTimeout(() => {
-      transitionIn(containerRef.current, 'opacity 0.55s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)', 'scale(1)');
-      transitionIn(titleRef.current,     'opacity 0.4s ease 0.25s, transform 0.4s ease 0.25s', 'translateY(0)');
-      transitionIn(subRef.current,       'opacity 0.4s ease 0.4s,  transform 0.4s ease 0.4s',  'translateY(0)');
-    }, 80);
-
-    const t3 = setTimeout(() => setFading(true), 2000);
-    const t4 = setTimeout(() => onDoneRef.current(), 2400);
-
-    return () => { clearTimeout(t1); clearTimeout(t3); clearTimeout(t4); };
+    const t1 = setTimeout(() => setFading(true), 2200);
+    const t2 = setTimeout(() => onDoneRef.current(), 2600);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
   return (
@@ -56,31 +23,35 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         gap: 16,
       }}
     >
-      <div ref={containerRef} style={{ paddingBottom: 16 }}>
+      {/* Bob wrapper handles the idle float; inner img handles the hop entrance —
+          split across two elements so the two transforms don't collide. */}
+      <div className="splash-frog-bob" style={{ paddingBottom: 16 }}>
         <img
+          className="splash-frog-hop"
           src={logoImg}
           alt="FrogWeather Logo"
           style={{
-            width: 300,
+            width: 'min(82vw, 360px)',
             objectFit: 'contain',
             userSelect: 'none',
             display: 'block',
-            filter: 'drop-shadow(0px 0px 32px rgba(0,60,120,0.30)) drop-shadow(0px 0px 10px rgba(0,0,0,0.12))',
           }}
         />
       </div>
 
       <p
-        ref={titleRef}
         style={{
           fontFamily: 'Outfit', fontSize: 36, fontWeight: 600,
           color: '#0060ac', letterSpacing: '-0.02em', marginTop: 8,
+          animation: 'splash-text-rise 0.4s ease 0.55s both',
         }}
       >FrogWeather</p>
 
       <p
-        ref={subRef}
-        style={{ fontFamily: 'Inter', fontSize: 15, color: '#717783' }}
+        style={{
+          fontFamily: 'Inter', fontSize: 15, color: '#717783',
+          animation: 'splash-text-rise 0.4s ease 0.72s both',
+        }}
       >Der Wetterfrosch fürs iPhone</p>
     </div>
   );
