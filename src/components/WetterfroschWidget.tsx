@@ -22,8 +22,8 @@ function getCondition(code: number): Condition {
 
 const FROGS: Record<Condition, string> = {
   sunny:   frosch1,
-  neutral: frosch2,
-  cloudy:  frosch3,
+  neutral: frosch3,
+  cloudy:  frosch2,
   rain:    frosch4,
   snow:    frosch5,
 };
