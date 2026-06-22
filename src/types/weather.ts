@@ -21,6 +21,15 @@ export interface CurrentWeatherData {
   time: string;
 }
 
+/** Gemessene aktuelle Werte einer DWD-Station (via Bright Sky). */
+export interface CurrentObservation {
+  temperature_2m: number;
+  weather_code: number;
+  windspeed_10m?: number;
+  relativehumidity_2m?: number;
+  source: 'DWD';
+}
+
 export interface DailyWeatherData {
   time: string[];
   weather_code: number[];

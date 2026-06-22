@@ -4,6 +4,17 @@ Alle relevanten Änderungen an der App, gegliedert nach Version.
 
 ---
 
+## v2.3 — 15. Juni 2026
+
+- Echte DWD-Messwerte für die aktuelle Wetterlage in Deutschland (via Bright Sky `/current_weather`)
+- Der „Aktuell"-Block zeigt gemessene Temperatur, Zustand, Wind und Luftfeuchte der nächstgelegenen DWD-Station; außerhalb der Stationsabdeckung automatischer Fallback auf Open-Meteo
+- Kleines „Messwert · DWD"-Badge im Dashboard-Hero, wenn echte Messwerte verwendet werden
+- Quellenangabe „Deutscher Wetterdienst" in den Einstellungen ergänzt (Lizenzpflicht)
+- Splash-Screen: Frosch ohne Schatten, größer und mit federnder Hüpf-Animation
+- iOS-App-Icon (und PWA-Icons) zeigen jetzt den Wetterfrosch
+- Frosch-Kachel: Frosch füllt die Kachel angenehmer aus
+- Frosch-Kachel: Bilder für „Bewölkt" und „Leicht bewölkt" korrigiert
+
 ## v2.2 — 12. Juni 2026
 
 - CSS-Design-Token-System: Farben via CSS Custom Properties (`--c-primary`, `--c-muted`, etc.), kein isDark-Ternär mehr in Komponenten

@@ -19,6 +19,7 @@ interface DashboardProps {
   alerts: WeatherAlert[];
   isDark?: boolean;
   lastUpdated?: Date | null;
+  currentSource?: string | null;
   onNavigateToRadar: () => void;
 }
 
@@ -216,7 +217,7 @@ function SunArc({
 
 export default function Dashboard({
   weather, cityName, country, timezone, tempUnit, windUnit,
-  lat, lon, alerts, isDark = false, lastUpdated, onNavigateToRadar,
+  lat, lon, alerts, isDark = false, lastUpdated, currentSource, onNavigateToRadar,
 }: DashboardProps) {
   const { current, daily, hourly } = weather;
   const info = getWeatherInfo(current.weather_code);
@@ -284,6 +285,21 @@ export default function Dashboard({
             <p style={{ fontFamily: 'Inter', fontSize: 11, color: 'var(--c-muted)', opacity: 0.65, fontVariantNumeric: 'tabular-nums' }}>
               {lastUpdated.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr
             </p>
+          </div>
+        )}
+
+        {currentSource && (
+          <div
+            title="Aktuelle Werte aus echten Stationsmesswerten"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 6,
+              padding: '2px 8px', borderRadius: 10, background: 'var(--c-fill)',
+            }}
+          >
+            <span className="material-symbols-outlined mat-fill" style={{ fontSize: 12, color: '#10b981' }}>verified</span>
+            <span style={{ fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: 'var(--c-muted)' }}>
+              Messwert · {currentSource}
+            </span>
           </div>
         )}
 
