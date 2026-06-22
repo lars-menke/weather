@@ -7,7 +7,7 @@ import Dashboard from './pages/Dashboard';
 import ForecastPage from './pages/ForecastPage';
 import RadarScreen from './pages/RadarScreen';
 import SettingsScreen from './pages/SettingsScreen';
-import { fetchWeather, searchCities, fetchAlerts } from './api/weather';
+import { fetchWeather, searchCities, fetchAlerts, fetchCurrentObservation } from './api/weather';
 import type { WeatherResponse, GeoLocation, TempUnit, WindUnit, Favorite, WeatherAlert } from './types/weather';
 import { getWeatherBackground, DEFAULT_THEME } from './lib/weatherTheme';
 import './App.css';
@@ -52,6 +52,7 @@ export default function App() {
   const [favorites, setFavorites] = useState<Favorite[]>(loadFavorites);
   const [alerts, setAlerts] = useState<WeatherAlert[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [currentSource, setCurrentSource] = useState<string | null>(null);
   const [pullDist, setPullDist] = useState(0);
 
   const pullRef = useRef({ startY: 0, dist: 0 });
@@ -60,7 +61,19 @@ export default function App() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await fetchWeather(lat, lon, tu, wu);
+      // Open-Meteo als Basis; DWD-Messwerte (Bright Sky) parallel – kein Mehraufwand,
+      // überschreiben nur den "Aktuell"-Block, wenn eine Station in Reichweite ist.
+      const [data, obs] = await Promise.all([
+        fetchWeather(lat, lon, tu, wu),
+        fetchCurrentObservation(lat, lon, tu, wu),
+      ]);
+      if (obs) {
+        const { source, ...vals } = obs;
+        data.current = { ...data.current, ...vals };
+        setCurrentSource(source);
+      } else {
+        setCurrentSource(null);
+      }
       setWeather(data);
       setLastUpdated(new Date());
       setCityName(city);
@@ -339,6 +352,7 @@ export default function App() {
               alerts={alerts}
               isDark={theme.isDark}
               lastUpdated={lastUpdated}
+              currentSource={currentSource}
               onNavigateToRadar={() => setActiveTab(2)}
             />
           )}

@@ -6,6 +6,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.3',
+    date: '15. Juni 2026',
+    items: [
+      { icon: 'verified',     text: 'Echte DWD-Messwerte für die aktuelle Wetterlage in Deutschland (via Bright Sky)' },
+      { icon: 'cloud',        text: '„Aktuell" zeigt jetzt gemessene Temperatur, Zustand, Wind und Feuchte der nächsten Station' },
+      { icon: 'fact_check',   text: 'Quellenangabe „Deutscher Wetterdienst" in den Einstellungen ergänzt' },
+      { icon: 'cruelty_free', text: 'Splash-Screen: Frosch ohne Schatten, größer und mit Hüpf-Animation' },
+      { icon: 'apps',         text: 'iOS-App-Icon zeigt jetzt den Wetterfrosch' },
+      { icon: 'grid_view',    text: 'Frosch-Kachel: Frosch füllt die Kachel besser aus' },
+      { icon: 'bug_report',   text: 'Frosch-Kachel: Bilder für „Bewölkt" und „Leicht bewölkt" korrigiert' },
+    ],
+  },
+  {
     version: '2.2',
     date: '12. Juni 2026',
     items: [

@@ -132,9 +132,10 @@ export default function SettingsScreen({ tempUnit, windUnit, onTempUnit, onWindU
       <section>
         <SectionLabel>Datenquellen</SectionLabel>
         <div style={glassCard}>
-          <InfoRow icon="cloud" iconColor="#0060ac" label="Wetterdaten" value="Open-Meteo (open-meteo.com)" />
+          <InfoRow icon="cloud" iconColor="#0060ac" label="Wettervorhersage" value="Open-Meteo (open-meteo.com)" />
+          <InfoRow icon="verified" iconColor="#10b981" label="Messwerte & Warnungen" value="Quelle: Deutscher Wetterdienst (via Bright Sky)" />
           <InfoRow icon="radar" iconColor="#6366f1" label="Radardaten" value="RainViewer (rainviewer.com)" />
-          <InfoRow icon="map" iconColor="#10b981" label="Karten" value="OpenStreetMap contributors" divider={false} />
+          <InfoRow icon="map" iconColor="#f59e0b" label="Karten" value="OpenStreetMap contributors" divider={false} />
         </div>
       </section>
 
